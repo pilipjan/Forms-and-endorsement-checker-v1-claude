@@ -1,0 +1,18 @@
+{
+  "name": "Insurance Forms Comparator",
+  "short_name": "Forms Comparator",
+  "description": "Offline-capable comparator for insurance Forms & Endorsements schedules.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eef2f7",
+  "theme_color": "#111827",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

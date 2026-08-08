@@ -1,0 +1,10 @@
+*.log
+~$*
+.DS_Store
+Thumbs.db
+node_modules/
+dist/
+.vite/
+# Sensitive deployment files
+VPS/
+vibe-deploy.ps1

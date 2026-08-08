@@ -1,0 +1,3078 @@
+<!doctype html>
+<html data-offline-copy="true" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Insurance Forms Comparator (Analytics Build — Personal Use)</title>
+    <meta
+      name="description"
+      content="Offline-capable browser comparator for insurance forms and endorsements schedules. v2.0"
+    />
+    <meta name="theme-color" content="#111827" />
+    <style>
+/* ===== DESIGN TOKENS ===== */
+:root {
+  --bg: #f4f8ff;
+  --panel: #ffffff;
+  --ink: #1e293b;
+  --muted: #667085;
+  --line: #d7e3f5;
+  --navy: #0f4c9a;
+  --blue: #287ee4;
+  --blue-dark: #0f5fb9;
+  --accent: #ff7a1a;
+  --accent-dark: #e35f00;
+  --green: #15803d;
+  --yellow: #a16207;
+  --red: #b91c1c;
+  --orange: #c2410c;
+  --gray-bg: #e5e7eb;
+  --shadow: 0 18px 45px rgba(40, 126, 228, 0.1);
+  /* color strip colors */
+  --s-match:   #15803d;
+  --s-added:   #ca8a04;
+  --s-removed: #dc2626;
+  --s-changed: #ea580c;
+  --s-desc-changed: #8b5cf6;
+  --s-typo:         #d946ef;
+  --s-unknown: #64748b;
+  --s-manual: #0891b2;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0b1220;
+  --panel: #111827;
+  --ink: #e5eefb;
+  --muted: #a8b3c7;
+  --line: #26364f;
+  --navy: #60a5fa;
+  --blue: #60a5fa;
+  --blue-dark: #2563eb;
+  --accent: #fb923c;
+  --accent-dark: #f97316;
+  --green: #86efac;
+  --yellow: #fde68a;
+  --red: #fca5a5;
+  --orange: #fdba74;
+  --gray-bg: #273142;
+  --shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+  --s-match:   #4ade80;
+  --s-added:   #fbbf24;
+  --s-removed: #f87171;
+  --s-changed: #fb923c;
+  --s-desc-changed: #a78bfa;
+  --s-typo:         #f472b6;
+  --s-unknown: #94a3b8;
+}
+
+/* ===== BASE ===== */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: Aptos, "Segoe UI", Arial, sans-serif; }
+button, input, textarea { font: inherit; }
+
+/* ===== DARK MODE SIDEBAR ===== */
+:root[data-theme="dark"] .sidebar { background: linear-gradient(180deg, #123b74 0%, #0b2c59 55%, #081f3d 100%); }
+:root[data-theme="dark"] .brand-mark { background: #eaf4ff; color: #0f5fb9; }
+:root[data-theme="dark"] .nav-list a { background: rgba(255,255,255,0.1); }
+:root[data-theme="dark"] .privacy-banner { background: #102647; border-color: #1e5da8; color: #dbeafe; }
+:root[data-theme="dark"] .privacy-banner strong, :root[data-theme="dark"] .privacy-banner span { color: #e5eefb; }
+:root[data-theme="dark"] .memory-banner { background: #111827; border-color: #26364f; }
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] input:not([type="checkbox"]),
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] .btn.secondary { background: #0f172a; border-color: #2c3f5f; color: #e5eefb; }
+:root[data-theme="dark"] th { background: #1f2d44; color: #e5eefb; }
+:root[data-theme="dark"] .result-table th:nth-child(-n+3) { background: #1d4ed8; }
+:root[data-theme="dark"] dialog { background: var(--panel); color: var(--ink); border-color: var(--line); }
+
+/* ===== LAYOUT ===== */
+.app-shell {
+  display: grid;
+  grid-template-columns: 300px minmax(0,1fr);
+  min-height: 100vh;
+  transition: grid-template-columns 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sidebar {
+  background: linear-gradient(180deg,#287ee4 0%,#0f5fb9 54%,#184f8f 100%);
+  color: #f8fafc;
+  padding: 24px;
+  width: 300px;
+  min-width: 0;
+  overflow: hidden;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), padding 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, min-width 0.25s ease;
+}
+.app-shell.sidebar-collapsed {
+  grid-template-columns: 0px minmax(0,1fr);
+}
+.app-shell.sidebar-collapsed .sidebar {
+  width: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+  overflow: hidden !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+.brand { display: flex; gap: 14px; align-items: center; }
+.brand-mark { display: grid; width: 44px; height: 44px; place-items: center; border: 1px solid rgba(255,255,255,0.24); background: #fff; color: #287ee4; border-radius: 8px; font-weight: 800; }
+.brand h1 { margin: 0; font-size: 18px; line-height: 1.2; }
+.brand p, .side-panel p { margin: 4px 0 0; color: #cbd5e1; font-size: 13px; }
+.nav-list { display: grid; gap: 8px; margin: 28px 0; }
+.nav-list a { color: #fff; text-decoration: none; padding: 10px 12px; border-radius: 8px; background: rgba(255,255,255,0.14); }
+.side-panel { padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.15); }
+.side-panel h2 { margin: 0 0 10px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
+.side-panel ol { margin: 0; padding-left: 18px; color: #e2e8f0; line-height: 1.6; font-size: 13px; }
+.compact { margin-top: 20px; }
+.main { padding: 24px; min-width: 0; }
+.topbar, .section-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.eyebrow { margin: 0 0 4px; color: var(--blue); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.topbar h2, .section-head h3 { margin: 0; }
+.topbar h2 { font-size: 26px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; }
+.topbar { border-bottom: 4px solid var(--accent); padding-bottom: 18px; }
+
+/* ===== BANNERS ===== */
+.privacy-banner, .memory-banner { margin: 18px 0 0; padding: 12px 14px; border: 1px solid #bfdbfe; border-radius: 8px; background: #eff6ff; color: #1e3a8a; line-height: 1.45; }
+.privacy-banner strong { color: #172033; }
+.privacy-banner span { display: inline-block; margin-left: 8px; color: #475569; font-size: 13px; }
+.memory-banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #fff; color: var(--ink); }
+.memory-banner span { margin-left: 8px; color: var(--muted); font-size: 13px; }
+
+/* ===== UTILITIES ===== */
+.hidden { display: none !important; }
+.collapsed-doc textarea, .collapsed-doc .preview-table-wrap { display: none; }
+.collapsed-doc { box-shadow: none; }
+.section-note { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+
+/* ===== BUTTONS ===== */
+.btn { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 10px 14px; border-radius: 8px; cursor: pointer; font-weight: 700; text-decoration: none; transition: background 0.15s, border-color 0.15s; white-space: nowrap; }
+.btn:hover { border-color: #93c5fd; }
+.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+.btn.secondary { background: #f8fafc; }
+.btn.small { padding: 6px 10px; font-size: 12px; }
+.btn.danger { color: var(--red); border-color: #fecaca; background: #fff7f7; }
+.btn.toggle-on { background: var(--accent) !important; color: #fff !important; border-color: var(--accent-dark) !important; }
+.select-label { align-self: center; color: var(--muted); font-size: 13px; font-weight: 700; }
+select { min-height: 38px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); padding: 0 10px; font: inherit; }
+
+/* ===== METRICS ===== */
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px,1fr)); gap: 12px; margin: 22px 0; }
+.metric, .chart-panel, .policy-pane, .results-section, .settings-section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
+.metric { padding: 14px; position: relative; overflow: hidden; }
+.metric::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.metric.good::after { background: var(--s-match); }
+.metric.added::after { background: var(--s-added); }
+.metric.removed::after { background: var(--s-removed); }
+.metric.changed::after { background: var(--s-changed); }
+.metric.desc-changed::after { background: var(--s-desc-changed); }
+.metric.typo::after { background: var(--s-typo); }
+.metric span { display: block; min-height: 34px; color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; }
+.metric strong { font-size: 26px; }
+.metric.good strong { color: var(--green); }
+.metric.added strong { color: var(--yellow); }
+.metric.removed strong { color: var(--red); }
+.metric.changed strong { color: var(--orange); }
+.metric.desc-changed strong { color: #8b5cf6; }
+:root[data-theme="dark"] .metric.desc-changed strong { color: #a78bfa; }
+.metric.typo strong { color: #d946ef; }
+:root[data-theme="dark"] .metric.typo strong { color: #f472b6; }
+.metric.unknown strong { color: #475569; }
+
+/* ===== GRIDS ===== */
+.dashboard-grid, .workspace { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 16px; margin-bottom: 16px; }
+.chart-panel, .policy-pane, .results-section, .settings-section { padding: 16px; min-width: 0; }
+.section-head span { color: var(--muted); font-size: 13px; }
+canvas { display: block; width: 100%; max-height: 240px; margin-top: 12px; }
+
+/* ===== TEXTAREA ===== */
+textarea { width: 100%; height: 210px; margin: 12px 0; padding: 12px; border: 1px solid var(--line); border-radius: 8px; resize: vertical; color: var(--ink); background: #fbfdff; line-height: 1.4; }
+
+/* ===== TABLES ===== */
+.preview-table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 8px; max-height: 320px; }
+.results-table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 8px; max-height: 480px; }
+table { width: 100%; border-collapse: collapse; min-width: 680px; }
+th, td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
+th { background: #f1f5f9; color: #334155; font-weight: 800; position: sticky; top: 0; z-index: 1; }
+.result-table th:nth-child(-n+3) { background: var(--blue-dark); color: #f8fafc; }
+.copyable-header {
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.copyable-header:hover {
+  background-color: var(--accent) !important;
+  color: #fff !important;
+}
+.copyable-header:active {
+  background-color: var(--accent-dark) !important;
+}
+.header-copied {
+  background-color: #16a34a !important;
+  color: #fff !important;
+}
+
+/* Group header rows */
+.result-group-row td { background: linear-gradient(90deg, var(--blue-dark), var(--blue)) !important; color: #f8fafc; font-weight: 800; letter-spacing: 0.01em; }
+.result-group-button { border: 0; background: transparent; color: inherit; cursor: pointer; font: inherit; font-weight: 800; padding: 0; }
+.result-group-meta { color: #eaf4ff; font-weight: 600; margin-left: 10px; font-size: 12px; }
+
+/* ===== V2.0 COLOR STRIP ROWS ===== */
+/* Subtle tint + 4px left border on first TD */
+tr.status-match             { background: rgba(21,128,61,0.05); }
+tr.status-match td:first-child             { border-left: 4px solid var(--s-match); }
+tr.status-added             { background: rgba(202,138,4,0.07); }
+tr.status-added td:first-child             { border-left: 4px solid var(--s-added); }
+tr.status-removed           { background: rgba(220,38,38,0.07); }
+tr.status-removed td:first-child           { border-left: 4px solid var(--s-removed); }
+tr.status-edition-changed,
+tr.status-revised           { background: rgba(234,88,12,0.06); }
+tr.status-edition-changed td:first-child,
+tr.status-revised td:first-child           { border-left: 4px solid var(--s-changed); }
+tr.status-description-changed { background: rgba(139,92,246,0.05); }
+tr.status-description-changed td:first-child { border-left: 4px solid var(--s-desc-changed); }
+tr.status-possible-typo     { background: rgba(217,70,239,0.05); }
+tr.status-possible-typo td:first-child { border-left: 4px solid var(--s-typo); }
+tr.status-unknown-format,
+tr.status-unknown           { background: rgba(100,116,139,0.06); }
+tr.status-unknown-format td:first-child,
+tr.status-unknown td:first-child           { border-left: 4px solid var(--s-unknown); }
+tr.status-manually-linked   { background: rgba(8,145,178,0.06); }
+tr.status-manually-linked td:first-child   { border-left: 4px solid var(--s-manual); }
+
+/* Dark mode subtle tints */
+:root[data-theme="dark"] tr.status-match           { background: rgba(74,222,128,0.06); }
+:root[data-theme="dark"] tr.status-added           { background: rgba(251,191,36,0.08); }
+:root[data-theme="dark"] tr.status-removed         { background: rgba(248,113,113,0.08); }
+:root[data-theme="dark"] tr.status-edition-changed,
+:root[data-theme="dark"] tr.status-revised         { background: rgba(251,146,60,0.08); }
+:root[data-theme="dark"] tr.status-description-changed { background: rgba(167,139,250,0.08); }
+:root[data-theme="dark"] tr.status-possible-typo     { background: rgba(244,114,182,0.08); }
+:root[data-theme="dark"] tr.status-unknown-format,
+:root[data-theme="dark"] tr.status-unknown         { background: rgba(148,163,184,0.08); }
+:root[data-theme="dark"] tr.status-manually-linked { background: rgba(34,211,238,0.08); }
+
+/* Pinned rows */
+tr.row-pinned { outline: 1px dashed var(--accent); outline-offset: -1px; }
+
+/* ===== RESULTS SECTION HEAD ===== */
+.results-section { margin-bottom: 16px; }
+.results-section-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.results-section-head h3 { margin: 0; flex-shrink: 0; }
+.results-copy-group { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; justify-content: flex-end; align-items: center; }
+
+/* ===== FILTER BAR ===== */
+.filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 16px; background: var(--bg); border-bottom: 1px solid var(--line); }
+.filter-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; border: 1.5px solid var(--line); background: var(--panel); cursor: pointer; font-size: 12px; font-weight: 700; color: var(--ink); transition: opacity 0.15s, border-color 0.15s; user-select: none; }
+.chip:hover { border-color: var(--blue); }
+.chip.off { opacity: 0.38; }
+.chip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.chip-match  .chip-dot { background: var(--s-match); }
+.chip-added  .chip-dot { background: var(--s-added); }
+.chip-removed .chip-dot { background: var(--s-removed); }
+.chip-changed .chip-dot { background: var(--s-changed); }
+.chip-desc-changed .chip-dot { background: var(--s-desc-changed); }
+.chip-typo .chip-dot { background: var(--s-typo); }
+.chip-unknown .chip-dot { background: var(--s-unknown); }
+.filter-search-wrap { flex: 1; min-width: 140px; position: relative; }
+.filter-search-wrap input[type="search"] { width: 100%; padding: 6px 12px 6px 30px; border: 1.5px solid var(--line); border-radius: 20px; background: var(--panel); color: var(--ink); font-size: 13px; outline: none; transition: border-color 0.15s; }
+.filter-search-wrap input[type="search"]:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(40,126,228,0.15); }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 13px; pointer-events: none; }
+.filter-actions { display: flex; gap: 5px; flex-shrink: 0; }
+
+/* ===== ROW ACTION BUTTONS ===== */
+.pin-btn, .note-btn, .link-btn { background: none; border: none; cursor: pointer; font-size: 14px; padding: 1px 3px; color: var(--muted); transition: transform 0.12s, color 0.12s; line-height: 1; }
+.pin-btn:hover  { transform: scale(1.2); }
+.note-btn:hover { transform: scale(1.15); color: var(--blue); }
+.link-btn:hover { transform: scale(1.15); color: var(--s-manual); }
+.pin-btn.on   { color: #f59e0b; }
+.note-btn.on  { color: var(--accent); }
+.link-btn.on  { color: var(--s-manual); animation: link-pulse 1s ease-in-out infinite; }
+@keyframes link-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.row-actions-td { white-space: nowrap; text-align: right; min-width: 84px; }
+
+.dup-badge, .conf-badge {
+  display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 5px;
+  border-radius: 999px; margin-left: 6px; vertical-align: middle; cursor: help;
+}
+.dup-badge  { background: rgba(220,38,38,0.12); color: var(--s-removed); }
+.conf-badge { background: rgba(148,163,184,0.18); color: var(--muted); }
+:root[data-theme="dark"] .dup-badge  { background: rgba(248,113,113,0.18); }
+:root[data-theme="dark"] .conf-badge { background: rgba(148,163,184,0.22); }
+
+/* ===== EDITABLE CELLS ===== */
+[contenteditable] { border-radius: 3px; padding: 1px 3px; margin: -1px -3px; outline: none; }
+[contenteditable]:focus { background: var(--panel); box-shadow: 0 0 0 2px var(--blue); border-radius: 3px; }
+
+/* ===== SEARCH HIGHLIGHT ===== */
+mark.hl { background: #fef08a; color: #1e293b; border-radius: 2px; padding: 0 1px; }
+:root[data-theme="dark"] mark.hl { background: #713f12; color: #fef3c7; }
+
+/* ===== INLINE DIFF HIGHLIGHTING ===== */
+.diff-removed-inline {
+  background-color: rgba(220, 38, 38, 0.12);
+  color: #c2410c;
+  text-decoration: line-through;
+  padding: 1px 3px;
+  border-radius: 4px;
+  font-weight: 600;
+  border: 1px dashed rgba(220, 38, 38, 0.3);
+}
+:root[data-theme="dark"] .diff-removed-inline {
+  background-color: rgba(239, 68, 68, 0.18);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.diff-added-inline {
+  background-color: rgba(21, 128, 61, 0.12);
+  color: #166534;
+  padding: 1px 3px;
+  border-radius: 4px;
+  font-weight: 700;
+  border: 1px dashed rgba(21, 128, 61, 0.3);
+}
+:root[data-theme="dark"] .diff-added-inline {
+  background-color: rgba(74, 222, 128, 0.18);
+  color: #86efac;
+  border-color: rgba(74, 222, 128, 0.4);
+}
+
+/* ===== SIDE-BY-SIDE TABLE ===== */
+.sbs-table { min-width: 560px; }
+.sbs-table th { background: var(--blue-dark); color: #f8fafc; }
+:root[data-theme="dark"] .sbs-table th { background: #1d4ed8; }
+.sbs-removed { color: var(--red); }
+.sbs-added   { color: var(--green); font-weight: 700; }
+.sbs-changed { color: var(--orange); }
+.sbs-empty   { color: var(--muted); font-style: italic; font-size: 12px; }
+
+/* ===== DIALOGS ===== */
+dialog { padding: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--ink); box-shadow: 0 25px 60px rgba(0,0,0,0.22); }
+dialog::backdrop { background: rgba(0,0,0,0.35); backdrop-filter: blur(2px); }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 14px; border-bottom: 1px solid var(--line); }
+.modal-header h3 { margin: 0; font-size: 16px; }
+.modal-close-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: var(--muted); padding: 2px 6px; border-radius: 4px; line-height: 1; }
+.modal-close-btn:hover { background: var(--bg); color: var(--ink); }
+.modal-body { padding: 18px 20px; }
+.modal-footer { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line); margin-top: 4px; }
+
+/* Smart Export Modal */
+.smart-export-modal { width: min(500px, 94vw); }
+.export-opts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.export-opt-lbl { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--bg); transition: border-color 0.15s; }
+.export-opt-lbl:hover { border-color: var(--blue); }
+.export-opt-lbl input[type="checkbox"] { width: 15px; height: 15px; cursor: pointer; accent-color: var(--accent); }
+
+/* Note Dialog */
+.note-dialog { width: min(380px, 94vw); }
+.note-dialog-hdr { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--line); font-weight: 700; font-size: 13px; }
+.note-code-badge { font-family: monospace; background: var(--bg); padding: 1px 6px; border-radius: 4px; color: var(--blue); }
+.note-dialog textarea { width: 100%; min-height: 96px; padding: 12px 16px; border: none; border-bottom: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-size: 13px; resize: vertical; outline: none; border-radius: 0; display: block; }
+.note-dialog-ftr { padding: 10px 16px; display: flex; gap: 8px; justify-content: flex-end; }
+
+/* ===== UNDO TOAST ===== */
+.undo-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(110px); background: #1e293b; color: #f8fafc; padding: 11px 18px; border-radius: 10px; display: flex; align-items: center; gap: 14px; font-size: 13px; box-shadow: 0 8px 28px rgba(0,0,0,0.25); transition: transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275); z-index: 9000; pointer-events: none; }
+.undo-toast.show { transform: translateX(-50%) translateY(0); pointer-events: auto; }
+.undo-toast button { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 5px 12px; cursor: pointer; font: inherit; font-weight: 700; font-size: 12px; }
+.undo-toast button:hover { background: var(--accent-dark); }
+
+/* ===== KEYBOARD SHORTCUT HINTS ===== */
+.kbd { display: inline-block; padding: 1px 5px; font-size: 10px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 3px; line-height: 1.6; }
+.shortcuts-list { display: grid; gap: 5px; margin-top: 8px; }
+.shortcut-row { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #cbd5e1; }
+
+/* ===== SETTINGS ===== */
+.settings-section label { display: block; margin: 12px 0 6px; color: var(--muted); font-weight: 700; }
+.settings-section input { width: 100%; max-width: 620px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; }
+
+/* ===== COMPARE ACTION BAR ===== */
+.compare-action-bar {
+  display: flex;
+  justify-content: center;
+  margin: -4px 0 28px 0;
+}
+.large-compare-btn {
+  padding: 14px 44px;
+  font-size: 15px;
+  font-weight: 800;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(255, 122, 26, 0.24);
+  transition: transform 0.15s, background-color 0.15s, box-shadow 0.15s;
+}
+.large-compare-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(255, 122, 26, 0.35);
+}
+.large-compare-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 6px 15px rgba(255, 122, 26, 0.2);
+}
+.large-clear-btn {
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 10px;
+  margin-left: 12px;
+  transition: transform 0.15s, border-color 0.15s, background-color 0.15s;
+}
+.large-clear-btn:hover {
+  transform: translateY(-2px);
+  border-color: #93c5fd;
+}
+.large-clear-btn:active {
+  transform: translateY(1px);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1500px) { .workspace { grid-template-columns: 1fr; } }
+@media (max-width: 1180px) { .app-shell { grid-template-columns: 1fr; } .sidebar { position: static; } .dashboard-grid { grid-template-columns: 1fr; } }
+@media (max-width: 700px) {
+  .main, .sidebar { padding: 16px; }
+  .topbar, .section-head, .memory-banner { align-items: flex-start; flex-direction: column; }
+  .metrics { grid-template-columns: repeat(2, minmax(120px,1fr)); }
+  .export-opts-grid { grid-template-columns: 1fr; }
+  .results-copy-group { justify-content: flex-start; }
+  .filter-bar { flex-direction: column; align-items: flex-start; }
+}
+
+/* ===== TOGGLE GROUP (checklist current/previous) ===== */
+.toggle-group {
+  display: inline-flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid var(--line);
+  background: var(--gray-bg);
+}
+.toggle-btn {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 14px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.toggle-btn.active {
+  background: var(--blue-dark);
+  color: #fff;
+}
+.toggle-btn:not(.active):hover {
+  background: var(--blue);
+  color: #fff;
+}
+
+/* ===== COPYABLE TABLE CELLS ===== */
+td.cell-copy {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+td.cell-copy:hover {
+  background: rgba(255, 122, 26, 0.12) !important;
+}
+td.cell-copy.cell-flashed {
+  background: rgba(22, 163, 74, 0.2) !important;
+  color: #15803d;
+  font-weight: 700;
+}
+
+/* ===== MAXIMIZED FULL SCREEN VIEWS ===== */
+.results-section.maximized {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+  background: var(--panel) !important;
+  margin: 0 !important;
+  padding: 20px 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+}
+
+body.section-maximized {
+  overflow: hidden !important; /* Disable main body scrolling */
+}
+
+.results-section.maximized .results-table-wrap {
+  max-height: none !important;
+  flex: 1 !important;
+  margin: 12px 0 0 0 !important;
+  height: auto !important;
+}
+
+.results-section.maximized .results-section-head,
+.results-section.maximized .section-head {
+  padding: 0 0 12px 0 !important;
+  border-bottom: 1px solid var(--line) !important;
+  flex-shrink: 0 !important;
+}
+
+
+</style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <!-- ===== SIDEBAR ===== -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">IF</div>
+          <div>
+            <h1>Insurance Forms Comparator <span style="font-size:12px;font-weight:600;color:#0891b2;border:1px solid #0891b2;border-radius:999px;padding:2px 8px;vertical-align:middle;">analytics build — usage data sent to your server</span></h1>
+            <p>Forms &amp; Endorsements schedules</p>
+          </div>
+        </div>
+
+        <nav class="nav-list" aria-label="Workspace sections">
+          <a href="#workspace">Workspace</a>
+          <a href="#results">Results</a>
+          <a href="#settings">Settings</a>
+        </nav>
+
+        <section class="side-panel">
+          <h2>Workflow</h2>
+          <ol>
+            <li>Paste Previous and Current schedules.</li>
+            <li>Clean &amp; Preview both sides.</li>
+            <li>Fix OCR issues in the raw input.</li>
+            <li>Compare, then copy the Excel checklist.</li>
+          </ol>
+        </section>
+
+        <section class="side-panel compact">
+          <h2>Keyboard Shortcuts</h2>
+          <div class="shortcuts-list">
+            <div class="shortcut-row"><span>Compare</span><span><kbd class="kbd">Ctrl</kbd> <kbd class="kbd">1</kbd></span></div>
+            <div class="shortcut-row"><span>Smart Export</span><span><kbd class="kbd">Ctrl</kbd> <kbd class="kbd">2</kbd></span></div>
+            <div class="shortcut-row"><span>Search</span><span><kbd class="kbd">Ctrl</kbd> <kbd class="kbd">F</kbd></span></div>
+            <div class="shortcut-row"><span>Undo Clear</span><span><kbd class="kbd">Ctrl</kbd> <kbd class="kbd">Z</kbd></span></div>
+          </div>
+        </section>
+
+        <section class="side-panel compact">
+          <h2>Privacy</h2>
+          <p>No pasted policy data is uploaded or sent anywhere. Draft restore saves only in this browser.</p>
+        </section>
+
+        <section class="side-panel compact">
+          <h2>Version</h2>
+          <p>Offline-capable web app 2.0.0</p>
+        </section>
+      </aside>
+
+      <!-- ===== MAIN ===== -->
+      <main class="main">
+        <header class="topbar">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="btn secondary" id="toggleSidebarBtn" type="button" title="Toggle Sidebar" style="padding: 10px 12px; min-width: 42px;">☰</button>
+            <div>
+              <p class="eyebrow">Commercial policy processing</p>
+              <h2>Compare Previous vs Current policy forms</h2>
+            </div>
+          </div>
+          <div class="toolbar">
+            <button class="btn secondary" id="loadSamplesBtn" type="button">Load Sample</button>
+            <button class="btn secondary" id="showQuoteBtn" type="button">Add 3rd Document</button>
+            <button class="btn secondary" id="showFourthBtn" type="button">Add 4th Document</button>
+            <button class="btn secondary" id="themeToggleBtn" type="button">Dark Mode</button>
+            <button class="btn secondary" id="clearBtn" type="button">Clear</button>
+            <span class="btn secondary" aria-disabled="true">Offline Copy</span>
+            <button class="btn primary" id="compareBtn" type="button">⚡ Compare Policies</button>
+          </div>
+        </header>
+
+        <section class="privacy-banner" aria-label="Privacy and offline notice">
+          <strong>Privacy notice:</strong>
+          This tool runs entirely in your browser. Pasted policy data is not uploaded, tracked, or sent to a server.
+          Draft restore saves locally on this device only.
+          <span id="offlineStatus">Offline copy ready after first load.</span>
+        </section>
+
+        <section class="memory-banner" aria-label="Local draft restore">
+          <div>
+            <strong>Local draft restore</strong>
+            <span id="memoryStatus">No saved draft yet.</span>
+          </div>
+          <div>
+            <button class="btn secondary small" id="clearDraftBtn" type="button">Delete Save</button>
+            <button class="btn primary small" id="saveDraftBtn" type="button">Save Draft</button>
+            <button class="btn small danger" id="undoBtn" type="button" title="Recover cleared tables (Ctrl+Z)" style="display:none;">Undo Clear</button>
+          </div>
+        </section>
+
+        <!-- ===== METRICS ===== -->
+        <section class="metrics" aria-label="Comparison summary">
+          <div class="metric"><span>Previous</span><strong id="metricPrevious">0</strong></div>
+          <div class="metric"><span>Current</span><strong id="metricCurrent">0</strong></div>
+          <div class="metric good"><span>Matches</span><strong id="metricMatch">0</strong></div>
+          <div class="metric added"><span>Added</span><strong id="metricAdded">0</strong></div>
+          <div class="metric removed"><span>Removed</span><strong id="metricRemoved">0</strong></div>
+          <div class="metric changed"><span>Edition Changed</span><strong id="metricChanged">0</strong></div>
+          <div class="metric desc-changed"><span>Desc Changed</span><strong id="metricDescChanged">0</strong></div>
+          <div class="metric typo"><span>Possible Typo</span><strong id="metricTypo">0</strong></div>
+          <div class="metric unknown"><span>Unknown</span><strong id="metricUnknown">0</strong></div>
+          <div class="metric"><span>Completion</span><strong id="metricCompletion">0%</strong></div>
+        </section>
+
+        <!-- ===== HTML CHARTS ===== -->
+        <!-- Charts side-by-side -->
+        <section class="dashboard-grid">
+          <div class="chart-panel">
+            <div class="section-head">
+              <h3>Outcome Mix</h3>
+              <span>Percentage</span>
+            </div>
+            <canvas id="pieChart" width="340" height="220" aria-label="Status distribution chart"></canvas>
+          </div>
+          <div class="chart-panel">
+            <div class="section-head">
+              <h3>Status Counts</h3>
+              <span>Forms count</span>
+            </div>
+            <canvas id="barChart" width="560" height="220" aria-label="Status count chart"></canvas>
+          </div>
+        </section>
+
+        <!-- ===== WORKSPACE ===== -->
+        <section class="workspace" id="workspace">
+          <article class="policy-pane">
+            <div class="section-head">
+              <h3>Previous Policy</h3>
+              <button class="btn small" id="cleanPreviousBtn" type="button">Clean &amp; Preview</button>
+            </div>
+            <textarea id="previousInput" spellcheck="false" placeholder="Paste previous policy forms here"></textarea>
+            <div class="preview-table-wrap">
+              <table><thead><tr><th>Status</th><th>Code</th><th>Edition</th><th>Description</th></tr></thead>
+              <tbody id="previousPreview"></tbody></table>
+            </div>
+          </article>
+
+          <article class="policy-pane">
+            <div class="section-head">
+              <h3>Current Policy</h3>
+              <button class="btn small" id="cleanCurrentBtn" type="button">Clean &amp; Preview</button>
+            </div>
+            <textarea id="currentInput" spellcheck="false" placeholder="Paste current policy forms here"></textarea>
+            <div class="preview-table-wrap">
+              <table><thead><tr><th>Status</th><th>Code</th><th>Edition</th><th>Description</th></tr></thead>
+              <tbody id="currentPreview"></tbody></table>
+            </div>
+          </article>
+
+          <article class="policy-pane optional-doc hidden" id="quotePane">
+            <div class="section-head">
+              <h3>Quote / 3rd Document</h3>
+              <div class="toolbar">
+                <button class="btn small" id="collapseQuoteBtn" type="button">Minimize</button>
+                <button class="btn small danger" id="removeQuoteBtn" type="button">Remove</button>
+                <button class="btn small" id="cleanQuoteBtn" type="button">Clean &amp; Preview</button>
+              </div>
+            </div>
+            <textarea id="quoteInput" spellcheck="false" placeholder="Paste quote or third schedule here"></textarea>
+            <div class="preview-table-wrap">
+              <table><thead><tr><th>Status</th><th>Code</th><th>Edition</th><th>Description</th></tr></thead>
+              <tbody id="quotePreview"></tbody></table>
+            </div>
+          </article>
+
+          <article class="policy-pane optional-doc hidden" id="fourthPane">
+            <div class="section-head">
+              <h3>4th Document</h3>
+              <div class="toolbar">
+                <button class="btn small" id="collapseFourthBtn" type="button">Minimize</button>
+                <button class="btn small danger" id="removeFourthBtn" type="button">Remove</button>
+                <button class="btn small" id="cleanFourthBtn" type="button">Clean &amp; Preview</button>
+              </div>
+            </div>
+            <textarea id="fourthInput" spellcheck="false" placeholder="Paste fourth schedule here"></textarea>
+            <div class="preview-table-wrap">
+              <table><thead><tr><th>Status</th><th>Code</th><th>Edition</th><th>Description</th></tr></thead>
+              <tbody id="fourthPreview"></tbody></table>
+            </div>
+          </article>
+        </section>
+
+        <!-- ===== COMPARE ACTION BAR ===== -->
+        <div class="compare-action-bar">
+          <button class="btn primary large-compare-btn" id="compareBtnWorkspace" type="button">⚡ Compare Policies</button>
+          <button class="btn secondary large-clear-btn" id="clearBtnWorkspace" type="button">🗑 Clear All</button>
+        </div>
+
+        <!-- ===== RESULTS SECTION ===== -->
+        <section class="results-section" id="results">
+          <!-- Head row: title + copy/export buttons -->
+          <div class="results-section-head">
+            <h3>Comparison Results</h3>
+            <div class="results-copy-group">
+              <label class="select-label" for="resultViewSelect">View</label>
+              <select id="resultViewSelect">
+                <option value="all">All compared documents</option>
+                <option value="Current Policy">Current Policy</option>
+                <option value="Quote / 3rd Document">3rd Document</option>
+                <option value="4th Document">4th Document</option>
+              </select>
+              <button class="btn secondary small" id="copyFormNumbersBtn" type="button">📋 Copy Numbers</button>
+              <button class="btn secondary small" id="copyDescriptionsBtn" type="button">📋 Descriptions</button>
+              <button class="btn secondary small" id="copyTableBtn" type="button">📋 Copy Table</button>
+              <button class="btn secondary small" id="exportCsvBtn" type="button">⬇ CSV</button>
+              <button class="btn secondary small" id="exportExcelBtn" type="button">⬇ Excel</button>
+              <button class="btn secondary small" id="exportJsonBtn" type="button">⬇ JSON</button>
+              <button class="btn primary small" id="smartExportBtn" type="button">✨ Smart Export</button>
+              <button class="btn secondary small" id="maximizeResultsBtn" type="button" style="font-weight:700; border-color:var(--accent);">⛶ Full Screen</button>
+            </div>
+          </div>
+
+          <p class="section-note" id="exportScopeNote" style="padding:4px 16px 0;">Exports use the selected view.</p>
+
+          <!-- V2.0 Filter Bar -->
+          <div class="filter-bar" id="filterBar">
+            <div class="filter-chips">
+              <button class="chip chip-match"   id="chipMatch"   type="button"><span class="chip-dot"></span> Match <span id="cntMatch">(0)</span></button>
+              <button class="chip chip-added"   id="chipAdded"   type="button"><span class="chip-dot"></span> Added <span id="cntAdded">(0)</span></button>
+              <button class="chip chip-removed" id="chipRemoved" type="button"><span class="chip-dot"></span> Removed <span id="cntRemoved">(0)</span></button>
+              <button class="chip chip-changed" id="chipChanged" type="button"><span class="chip-dot"></span> Changed <span id="cntChanged">(0)</span></button>
+              <button class="chip chip-desc-changed" id="chipDescChanged" type="button"><span class="chip-dot"></span> Desc Changed <span id="cntDescChanged">(0)</span></button>
+              <button class="chip chip-typo" id="chipTypo" type="button"><span class="chip-dot"></span> Possible Typo <span id="cntTypo">(0)</span></button>
+              <button class="chip chip-unknown" id="chipUnknown" type="button"><span class="chip-dot"></span> Unknown <span id="cntUnknown">(0)</span></button>
+            </div>
+            <div class="filter-search-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="search" id="resultsSearch" placeholder="Search forms... (Ctrl+F)" autocomplete="off">
+            </div>
+            <div class="filter-actions">
+              <button class="btn small" id="diffsOnlyBtn" type="button">Diffs Only</button>
+              <button class="btn small" id="sideBySideBtn" type="button">Side by Side</button>
+            </div>
+          </div>
+
+          <!-- Regular results table -->
+          <div class="results-table-wrap" id="resultsTableWrap" style="margin:0 16px 16px;">
+            <table class="result-table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Document</th>
+                  <th class="copyable-header" id="hdrCopyCode" title="Click to copy Code column">Code 📋</th>
+                  <th>Original Previous</th>
+                  <th>Original Current</th>
+                  <th class="copyable-header" id="hdrCopyDesc" title="Click to copy Description column">Description 📋</th>
+                  <th class="copyable-header" id="hdrCopyEdit" title="Click to copy Edition column">Edition 📋</th>
+                  <th>System Note</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="resultsBody"></tbody>
+            </table>
+          </div>
+
+          <!-- Side-by-side table (hidden by default) -->
+          <div class="results-table-wrap hidden" id="sbsWrap" style="margin:0 16px 16px;">
+            <table class="sbs-table">
+              <thead>
+                <tr>
+                  <th style="width:90px;">Status</th>
+                  <th class="copyable-header" id="hdrSbsPrev" title="Click to copy Previous Form column">Previous Form 📋</th>
+                  <th class="copyable-header" id="hdrSbsCurr" title="Click to copy Current Form column">Current Form 📋</th>
+                  <th style="width:70px;text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="sbsBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ===== EXCEL CHECKLIST ===== -->
+        <section class="results-section" id="excelChecklist">
+          <div class="section-head" style="padding:12px 16px;border-bottom:1px solid var(--line);">
+            <div>
+              <h3>Excel Paste Checklist</h3>
+              <p class="section-note">Click any column header to copy that column. Click a row cell to copy that cell.</p>
+            </div>
+            <div class="toolbar" style="gap:8px;align-items:center;">
+              <span style="font-size:12px;color:var(--muted);white-space:nowrap;">Show form from:</span>
+              <div class="toggle-group" id="checklistViewToggle">
+                <button class="toggle-btn active" id="clToggleCurrent" type="button" data-view="current">Current</button>
+                <button class="toggle-btn" id="clTogglePrevious" type="button" data-view="previous">Previous</button>
+              </div>
+              <button class="btn secondary" id="copyExcelBtn" type="button">Copy for Excel</button>
+              <button class="btn secondary" id="downloadTsvBtn" type="button">Download TSV</button>
+              <button class="btn secondary" id="maximizeChecklistBtn" type="button" style="font-weight:700; border-color:var(--accent);">⛶ Full Screen</button>
+            </div>
+          </div>
+          <div class="results-table-wrap" style="margin:12px 16px 16px;">
+            <table>
+              <thead><tr>
+                <th class="copyable-header" id="hdrClForm" title="Click to copy Form/Description column">Form / Description 📋</th>
+                <th class="copyable-header" id="hdrClEdition" title="Click to copy Edition column">Edition 📋</th>
+                <th class="copyable-header" id="hdrClStatus" title="Click to copy Status column">Status 📋</th>
+                <th class="copyable-header" id="hdrClSource" title="Click to copy Compared Document column">Compared Document 📋</th>
+              </tr></thead>
+              <tbody id="excelChecklistBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ===== SETTINGS ===== -->
+        <section class="settings-section" id="settings">
+          <div class="section-head">
+            <h3>Settings</h3>
+            <button class="btn small" id="applySettingsBtn" type="button">Apply Prefixes</button>
+          </div>
+          <label for="prefixInput">Known prefixes</label>
+          <input id="prefixInput" type="text" value="AG, AP, ASPCO, B, BCG, BCR, BCP, BDEC, BEONY, BIL, BM, BP, CA, CF, CG, CL, CM, CP, CR, CU, CX, CY, DE, DL, DP, DS, EB, EP, FB, FL, FO, FP, GI, HO, IH, IL, IM, IN, MC, MI, MM, MP, OP, PM, PP, PR, SE, SF, TC, WC" />
+        </section>
+      </main>
+    </div>
+
+    <!-- ===== SMART EXPORT MODAL ===== -->
+    <dialog id="smartExportModal" class="smart-export-modal">
+      <div class="modal-header">
+        <h3>✨ Smart Export</h3>
+        <button class="modal-close-btn" id="closeSmartExportBtn" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="export-opts-grid">
+          <label class="export-opt-lbl"><input type="checkbox" id="optDescriptions" checked> Include Descriptions</label>
+          <label class="export-opt-lbl"><input type="checkbox" id="optMatches" checked> Include Matches</label>
+          <label class="export-opt-lbl"><input type="checkbox" id="optStatus" checked> Include Status</label>
+          <label class="export-opt-lbl"><input type="checkbox" id="optUserNotes"> Include User Notes</label>
+          <label class="export-opt-lbl"><input type="checkbox" id="optDiffsOnly"> Differences Only</label>
+          <label class="export-opt-lbl"><input type="checkbox" id="optSource"> Include Source Doc</label>
+        </div>
+        <div class="modal-footer">
+          <button class="btn primary" id="smCopyExcelBtn" type="button">📋 Copy for Excel</button>
+          <button class="btn secondary" id="smCopyNumbersBtn" type="button">📋 Numbers Only</button>
+          <button class="btn secondary" id="smDownloadCsvBtn" type="button">⬇ CSV</button>
+          <button class="btn secondary" id="smDownloadExcelBtn" type="button">⬇ Excel</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- ===== NOTE DIALOG ===== -->
+    <dialog id="noteDialog" class="note-dialog">
+      <div class="note-dialog-hdr">
+        <span>📝 Note — <span id="noteCodeBadge" class="note-code-badge"></span></span>
+        <button class="modal-close-btn" id="closeNoteBtn" type="button">✕</button>
+      </div>
+      <textarea id="noteTextarea" placeholder="Type your note here… (Ctrl+Enter to save)"></textarea>
+      <div class="note-dialog-ftr">
+        <button class="btn secondary small" id="clearNoteBtn" type="button">Clear</button>
+        <button class="btn primary small" id="saveNoteBtn" type="button">Save Note</button>
+      </div>
+    </dialog>
+
+    <!-- ===== UNDO TOAST ===== -->
+    <div class="undo-toast" id="undoToast" role="status" aria-live="polite">
+      <span>Data cleared.</span>
+      <button id="undoBtn" type="button">↩ Undo</button>
+    </div>
+
+    <script>
+/**
+ * analytics.js — personal-use tracking for the Insurance Forms Comparator.
+ *
+ * This file only exists in the "web-analytics" variant. The public offline
+ * build (web/) stays untouched and sends nothing anywhere — keep it that way
+ * so the "nothing leaves your browser" claim on the live site stays true.
+ *
+ * Config: edit ANALYTICS_ENDPOINT and ANALYTICS_KEY below before deploying,
+ * or override at runtime via localStorage (see bottom of file).
+ */
+(function () {
+  const DEFAULT_CONFIG = {
+    // Point this at your analytics-server instance, e.g.:
+    // "https://forms-analytics.yourdomain.com/api/events" or "http://100.96.0.1:4100/api/events"
+    endpoint: "http://localhost:4100/api/events",
+    // Shared secret — must match ANALYTICS_KEY on the server. Not real auth,
+    // just keeps random scanners off your endpoint. Rotate it if it leaks.
+    apiKey: "change-me",
+    flushIntervalMs: 15000,
+    maxBatchSize: 25,
+    maxQueueSize: 500, // oldest events drop first if you're offline a long time
+  };
+
+  const STORAGE_KEY = "formsComparatorAnalyticsQueue";
+  const SESSION_KEY = "formsComparatorAnalyticsSession";
+
+  const config = { ...DEFAULT_CONFIG, ...(window.ANALYTICS_CONFIG_OVERRIDE || {}) };
+
+  function loadQueue() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  }
+  function saveQueue(q) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(q.slice(-config.maxQueueSize))); }
+    catch { /* storage full/unavailable — drop silently, tracking must never break the app */ }
+  }
+
+  function getSessionId() {
+    try {
+      let id = localStorage.getItem(SESSION_KEY);
+      if (!id) {
+        id = `s_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+        localStorage.setItem(SESSION_KEY, id);
+      }
+      return id;
+    } catch {
+      return "s_nostorage";
+    }
+  }
+
+  const sessionId = getSessionId();
+  let queue = loadQueue();
+  let flushing = false;
+
+  function track(event, data) {
+    try {
+      queue.push({
+        event,
+        data: data || {},
+        sessionId,
+        ts: new Date().toISOString(),
+      });
+      saveQueue(queue);
+      if (queue.length >= config.maxBatchSize) flush();
+    } catch (err) {
+      // Tracking must never throw into app code
+      console.warn("[analytics] track failed", err);
+    }
+  }
+
+  async function flush(useBeacon) {
+    if (flushing || !queue.length) return;
+    const batch = queue.slice(0, config.maxBatchSize);
+    flushing = true;
+    try {
+      const body = JSON.stringify({ events: batch });
+      if (useBeacon && navigator.sendBeacon) {
+        // Beacon can't carry custom headers, so the key rides in the payload for this path.
+        const blob = new Blob([JSON.stringify({ apiKey: config.apiKey, events: batch })], { type: "application/json" });
+        navigator.sendBeacon(config.endpoint, blob);
+        queue = queue.slice(batch.length);
+        saveQueue(queue);
+      } else {
+        const res = await fetch(config.endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Analytics-Key": config.apiKey },
+          body,
+        });
+        if (res.ok) {
+          queue = queue.slice(batch.length);
+          saveQueue(queue);
+        }
+        // Non-OK response: leave the batch queued, retry on next interval.
+      }
+    } catch {
+      // Offline or server down — batch stays queued, retried next interval. Expected for an offline-first tool.
+    } finally {
+      flushing = false;
+    }
+  }
+
+  window.setInterval(() => flush(false), config.flushIntervalMs);
+  window.addEventListener("beforeunload", () => flush(true));
+  window.addEventListener("online", () => flush(false));
+
+  // Catch unhandled JS errors too — these are exactly the kind of thing worth
+  // knowing about when you're not sitting there watching the console.
+  window.addEventListener("error", (e) => {
+    track("js_error", { message: e.message, file: e.filename, line: e.lineno });
+  });
+
+  window.ComparatorAnalytics = { track, flush: () => flush(false), sessionId, config };
+})();
+
+</script>
+    <script>
+(function () {
+  const defaultPrefixes = [
+    "AG", "AP", "ASPCO", "B", "BCG", "BCR", "BCP", "BDEC", "BEONY", "BIL", "BM", "BP",
+    "CA", "CF", "CG", "CL", "CM", "CP", "CR", "CU", "CX", "CY",
+    "DE", "DL", "DP", "DS", "DX", "EB", "EP", "FB", "FL", "FO", "FP", "GI", "HO", "IH", "IL", "IM",
+    "IN", "MC", "MI", "MM", "MP", "OP", "PM", "PN", "PP", "PR", "SE", "SF", "TC", "WC"
+  ];
+
+  function cleanText(value) {
+    return String(value || "")
+      .replace(/\t/g, " ")
+      .replace(/\u00a0/g, " ")
+      .replace(/[–—]/g, "-")
+      .replace(/[［\[]/g, "(")
+      .replace(/[］\]]/g, ")")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function parsePrefixes(value) {
+    const parts = String(value || "")
+      .split(",")
+      .map((part) => cleanText(part).toUpperCase())
+      .filter(Boolean);
+    return parts.length ? parts : defaultPrefixes.slice();
+  }
+
+  function formatEdition(edition) {
+    if (!edition) return "";
+    return edition.length === 4 ? `${edition.slice(0, 2)}/${edition.slice(2)}` : edition;
+  }
+
+  function displayFormCode(normalizedCode) {
+    if (!normalizedCode) return "";
+    const compact = cleanText(normalizedCode).replace(/\s/g, "").toUpperCase();
+    // Standard ISO 2-letter prefix + 4-digit form + 4-digit edition
+    if (/^[A-Z]{2}\d{8}$/.test(compact)) {
+      const prefix = compact.slice(0, 2);
+      const form = compact.slice(2, 6);
+      const edition = compact.slice(6, 10);
+      return `${prefix} ${form.slice(0, 2)} ${form.slice(2)} (${edition.slice(0, 2)}/${edition.slice(2)})`;
+    }
+    // Non-standard: return as-is (already reasonably formatted)
+    return normalizedCode;
+  }
+
+  function fixOcrPrefix(str, knownPrefixes) {
+    let clean = cleanText(str).trim();
+    if (!clean) return clean;
+    
+    // Safeguard: If the original unmodified prefix is already known, do not substitute!
+    const originalPrefixMatch = clean.match(/^([A-Z0-9]{2,8})/i);
+    if (originalPrefixMatch) {
+      const origPrefix = originalPrefixMatch[1].toUpperCase();
+      if ((knownPrefixes || []).some(p => origPrefix === p.toUpperCase() || origPrefix.startsWith(p.toUpperCase()))) {
+        return clean;
+      }
+    }
+    
+    // substitutions for common numeric OCR typos at the start of a code prefix
+    const substitutions = {
+      '8': 'B',
+      '0': 'O',
+      '1': 'I',
+      '5': 'S',
+      '2': 'Z'
+    };
+    
+    const firstChar = clean.charAt(0);
+    if (substitutions[firstChar]) {
+      const substituted = substitutions[firstChar] + clean.slice(1);
+      // See if it starts with a known prefix
+      const match = substituted.match(/^([A-Z]{2,8})/i);
+      if (match) {
+        const prefix = match[1].toUpperCase();
+        if ((knownPrefixes || []).some(p => prefix === p.toUpperCase() || prefix.startsWith(p.toUpperCase()))) {
+          return substituted;
+        }
+      }
+    }
+    return clean;
+  }
+
+  /**
+   * In Travelers/ISO spaced form codes (e.g. "IL T0 02 11 89"), the 2-char
+   * form-type segment (T0, U3, D2, etc.) always has a digit as the 2nd char.
+   * OCR commonly misreads 0→O, 1→I, 8→B, etc.  Fix those in the 2nd position only.
+   */
+  function fixOcrDigitInFormType(twoCharCode) {
+    if (!twoCharCode || twoCharCode.length !== 2) return twoCharCode || "";
+    const letterToDigit = {
+      'O': '0', 'Q': '0', 'D': '0',
+      'I': '1', 'L': '1',
+      'Z': '2',
+      'S': '5',
+      'B': '8',
+      'G': '6'
+    };
+    const first = twoCharCode[0]; // Keep letter (T, U, D, C, etc.)
+    const secondRaw = twoCharCode[1].toUpperCase();
+    // Only correct if it's a letter that looks like a digit
+    const second = (/[A-Z]/.test(secondRaw) && letterToDigit[secondRaw] !== undefined)
+      ? letterToDigit[secondRaw]
+      : secondRaw;
+    return first + second;
+  }
+
+  function parseFormLine(rawLine, knownPrefixes) {
+    const prefixes = knownPrefixes || defaultPrefixes;
+    let clean = cleanText(rawLine);
+    
+    // Fuzzy OCR prefix correction
+    clean = fixOcrPrefix(clean, prefixes);
+
+    const result = {
+      raw: rawLine,
+      clean,
+      normalizedCode: "",
+      baseCode: "",
+      displayCode: clean,
+      edition: "",
+      displayEdition: "",
+      description: "",
+      known: false,
+      parseStatus: clean ? "Unknown Format" : "Blank",
+    };
+
+    if (!clean) return result;
+
+    // 0. Spaced Travelers/ISO format: "XX XX ## [## ##] description"
+    //    e.g. "IL T0 02 11 89 COMMON POLICY DECLARATIONS"
+    //         "DX T0 00 11 12 DELUXE PROP COV PART DECLARATIONS"
+    //         "CG D2 46 04 19 BLANKET AI-W/COMP OPS IF REQ BY CONTRACT"
+    //         "IL T8 00 GENERAL PURPOSE ENDORSEMENT" (no edition)
+    //    The 2-char form-type (T0, U3, D2) may have OCR errors in its 2nd char.
+    const spacedMatch = clean.match(
+      /^([A-Z]{2})\s+([A-Z0-9]{2})\s+(\d{2})\b(?:\s+(\d{2})\b\s+(\d{2})\b)?(?:\s+(.+))?$/i
+    );
+    if (spacedMatch) {
+      const rawPrefix = spacedMatch[1].toUpperCase();
+      const rawFormType = spacedMatch[2].toUpperCase();
+      const formType = fixOcrDigitInFormType(rawFormType); // e.g. TO→T0
+      const formNum = spacedMatch[3];                       // e.g. "02"
+      let month = spacedMatch[4] || "";                     // e.g. "11"
+      let year  = spacedMatch[5] || "";                     // e.g. "89"
+      let description = cleanText(spacedMatch[6] || "");
+
+      // If no month/year captured from the spaced pattern but description starts with
+      // a (MM/YY) or MM/YY edition token, promote it to the edition fields.
+      // Handles: "CG 20 37 (04/13)" where (04/13) lands in description slot.
+      if (!month && !year && description) {
+        const trailingEd = description.match(/^\(?(\d{2})\/(\d{2})\)?\s*(.*)?$/);
+        if (trailingEd) {
+          month       = trailingEd[1];
+          year        = trailingEd[2];
+          description = cleanText(trailingEd[3] || "");
+        }
+      }
+
+      const baseCode = `${rawPrefix}${formType}${formNum}`.toUpperCase();
+      const edition = (month && year) ? `${month}${year}` : "";
+      const normalizedCode = `${baseCode}${edition}`;
+      const displayEdition = (month && year) ? `${month}/${year}` : "";
+      const displayCode = displayEdition
+        ? `${rawPrefix} ${formType} ${formNum} (${displayEdition})`
+        : `${rawPrefix} ${formType} ${formNum}`;
+      const known = prefixes.some(p => rawPrefix === p.toUpperCase() || rawPrefix.startsWith(p.toUpperCase()));
+
+      return {
+        ...result,
+        normalizedCode,
+        baseCode,
+        displayCode,
+        edition,
+        displayEdition,
+        description,
+        known,
+        parseStatus: "Parsed",
+      };
+    }
+
+    // 1. Try matching with edition delimiter first: e.g. "BCEE (10/13) COVERAGE ENHANCEMENT"
+    // Fits any alphanumeric code, an edition code, and then description.
+    const edMatch = clean.match(/^([A-Z0-9\-\s]{2,12})\s*\(?\s*(\d{2})\s*[\/\-]\s*(\d{2})\s*\)?\s*(.*)$/i);
+    if (edMatch) {
+      const rawCode = cleanText(edMatch[1]).replace(/\s/g, "");
+      const edition = `${edMatch[2]}${edMatch[3]}`;
+      const description = cleanText(edMatch[4]);
+      
+      const fallbackMatch = rawCode.match(/^([A-Z0-9]+?)(?=\d{2,6}$)/i) || rawCode.match(/^([A-Z]+)/i);
+      const prefix = (prefixes.find(p => rawCode.toUpperCase().startsWith(p.toUpperCase())) || (fallbackMatch ? fallbackMatch[1] : "")).toUpperCase();
+      const known = prefixes.some(p => prefix === p.toUpperCase() || prefix.startsWith(p.toUpperCase()));
+      
+      const normalizedCode = `${rawCode}${edition}`;
+      const displayCode = `${rawCode} (${edMatch[2]}/${edMatch[3]})`;
+
+      return {
+        ...result,
+        normalizedCode,
+        baseCode: rawCode,
+        displayCode,
+        edition,
+        displayEdition: `${edMatch[2]}/${edMatch[3]}`,
+        description,
+        known,
+        parseStatus: normalizedCode ? "Parsed" : "Unknown Format",
+      };
+    }
+
+    // 2. Standard prefix+digits pattern: e.g. "BP0002 COVERAGE FORM"
+    // We allow the prefix to have digits (non-greedy alphanumeric matching)
+    const match = clean.match(
+      /^\s*([A-Z0-9]{2,8}?)\s*(\d{2,6})\s*(?:\(?\s*(\d{2})\s*\/\s*(\d{2})\s*\)?)?/i
+    );
+    if (!match) return result;
+
+    const rawCode = `${match[1]}${match[2]}`.toUpperCase();
+    const fallbackMatch = rawCode.match(/^([A-Z0-9]+?)(?=\d{2,6}$)/i);
+    const prefix = (prefixes.find(p => rawCode.startsWith(p.toUpperCase())) || (fallbackMatch ? fallbackMatch[1] : match[1])).toUpperCase();
+    const formNumber = match[2];
+    const edition = match[3] && match[4] ? `${match[3]}${match[4]}` : "";
+
+    const normalizedCode = `${rawCode}${edition ? edition : ""}`;
+    const displayCode = edition
+      ? `${rawCode} (${match[3]}/${match[4]})`
+      : rawCode;
+
+    const description = cleanText(clean.slice(match[0].length));
+    const known = prefixes.some(p => prefix === p.toUpperCase() || prefix.startsWith(p.toUpperCase()));
+
+    return {
+      ...result,
+      normalizedCode,
+      baseCode: rawCode,
+      displayCode,
+      edition,
+      displayEdition: edition ? `${match[3]}/${match[4]}` : "",
+      description,
+      known,
+      parseStatus: normalizedCode ? "Parsed" : "Unknown Format",
+    };
+  }
+
+  function looksLikeCode(line, knownPrefixes) {
+    const clean = cleanText(line).replace(/\s/g, "").toUpperCase();
+    if (!clean) return false;
+    // Standard compact format: e.g. BP0002, BCEE, ILT00211
+    if (/^[A-Z]{2,8}\d{0,6}$/.test(clean)) return true;
+    // Spaced Travelers/ISO format after space-removal:
+    // 2-letter prefix + 2-alphanum form-type + 2-8 digits (form# + optional month+year)
+    // e.g. ILTO021189, DXT0001112, CGD2460419, ILT800
+    if (/^[A-Z]{2}[A-Z0-9]{2}\d{2,8}$/.test(clean)) return true;
+    return false;
+  }
+
+  function looksLikeDescriptionOnly(line) {
+    const clean = cleanText(line);
+    if (!clean) return false;
+    // Standard capitalized uppercase text, not a short code, not an edition
+    return /^[A-Z][A-Z\s\-\/\,\(\)\'\.\&]{4,}$/.test(clean) &&
+           !/^[A-Z]{2,10}\s*\d{2,}/.test(clean) &&
+           !/^\(?[0-9]{2}\/[0-9]{2}\)?$/.test(clean);
+  }
+
+  function looksLikeEdition(line) {
+    const clean = cleanText(line);
+    return /^\s*\(?\s*\d{2}\s*[\/\-]\s*\d{2}(?:\s*[\/\-]\s*\d{2,4})?\s*\)?\s*$/.test(clean);
+  }
+
+  function detectSplitColumn(lines, knownPrefixes) {
+    const prefixes = knownPrefixes || defaultPrefixes;
+    
+    // 1. Group non-empty lines separated by blanks
+    const groups = [];
+    let current = [];
+    for (const line of lines) {
+      const c = cleanText(line);
+      if (!c) {
+        if (current.length) { groups.push(current); current = []; }
+      } else {
+        current.push(c);
+      }
+    }
+    if (current.length) groups.push(current);
+
+    if (groups.length < 2) return null;
+
+    // 2. Classify each group
+    const groupTypes = groups.map(g => {
+      let codeCount = 0;
+      let editionCount = 0;
+      let descCount = 0;
+      
+      for (const line of g) {
+        const fixedLine = fixOcrPrefix(line, prefixes);
+        if (looksLikeEdition(line)) {
+          editionCount++;
+        } else if (looksLikeCode(fixedLine, prefixes)) {
+          codeCount++;
+        } else {
+          descCount++;
+        }
+      }
+      
+      const total = g.length || 1;
+      return {
+        lines: g,
+        isEdition: (editionCount / total) > 0.7,
+        isCode: (codeCount / total) > 0.6,
+        isDesc: (descCount / total) > 0.6 && (codeCount / total) < 0.3
+      };
+    });
+
+    const codeGroup = groupTypes.find(g => g.isCode);
+    const editionGroup = groupTypes.find(g => g.isEdition);
+    const descGroup = groupTypes.find(g => g.isDesc);
+
+    // Ensure we have at least a Code group and a Description group
+    if (codeGroup && descGroup) {
+      const codes = codeGroup.lines;
+      const descs = descGroup.lines;
+      const editions = editionGroup ? editionGroup.lines : [];
+
+      // Mismatch tolerance (must be relatively close in size)
+      const maxLen = Math.max(codes.length, descs.length);
+      const minLen = Math.min(codes.length, descs.length);
+      if (maxLen - minLen > maxLen * 0.4) return null;
+
+      const parsedLines = [];
+      for (let i = 0; i < codes.length; i++) {
+        const rawCode = codes[i] || "";
+        const fixedCode = fixOcrPrefix(rawCode, prefixes);
+        const editionStr = editions.length ? (editions[i] || "") : "";
+        const descStr = descs[i] || "";
+        
+        let combined = fixedCode;
+        if (editionStr) {
+          const cleanEd = cleanText(editionStr);
+          if (cleanEd.startsWith("(") && cleanEd.endsWith(")")) {
+            combined += ` ${cleanEd}`;
+          } else {
+            combined += ` (${cleanEd})`;
+          }
+        }
+        if (descStr) {
+          combined += ` ${descStr}`;
+        }
+
+        const parsed = parseFormLine(combined, prefixes);
+        if (parsed.normalizedCode) {
+          parsedLines.push(parsed);
+        } else {
+          // Fallback parsing
+          parsedLines.push({
+            raw: combined,
+            clean: combined,
+            normalizedCode: cleanText(fixedCode).replace(/\s/g, ""),
+            baseCode: cleanText(fixedCode).replace(/\s/g, ""),
+            displayCode: fixedCode,
+            edition: editionStr.replace(/[\(\)]/g, ""),
+            displayEdition: editionStr.replace(/[\(\)]/g, ""),
+            description: descStr,
+            known: false,
+            parseStatus: "Unknown Format"
+          });
+        }
+      }
+      return parsedLines;
+    }
+
+    return null;
+  }
+
+  function parseSchedule(text, knownPrefixes) {
+    const prefixes = knownPrefixes || defaultPrefixes;
+    const rawLines = String(text || "").split(/\r?\n/);
+    const nonEmpty = rawLines.filter(l => cleanText(l));
+
+    // Try split-column zipping first
+    if (nonEmpty.length >= 4) {
+      const splitResult = detectSplitColumn(rawLines, prefixes);
+      if (splitResult && splitResult.length) return splitResult;
+    }
+
+    // Standard linear parse
+    return rawLines
+      .map((line) => parseFormLine(line, prefixes))
+      .filter((item) => item.clean);
+  }
+
+  window.ComparatorParser = {
+    cleanText,
+    parsePrefixes,
+    parseFormLine,
+    parseSchedule,
+    displayFormCode,
+    formatEdition,
+    defaultPrefixes,
+  };
+})();
+
+
+</script>
+    <script>
+(function () {
+  function levenshtein(a, b) {
+    const matrix = [];
+    for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+    for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+    for (let i = 1; i <= b.length; i++) {
+      for (let j = 1; j <= a.length; j++) {
+        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
+          );
+        }
+      }
+    }
+    return matrix[b.length][a.length];
+  }
+
+  function getSimilarity(a, b) {
+    const cleanA = String(a || "").trim().toUpperCase();
+    const cleanB = String(b || "").trim().toUpperCase();
+    const distance = levenshtein(cleanA, cleanB);
+    const maxLen = Math.max(cleanA.length, cleanB.length);
+    if (maxLen === 0) return 1.0;
+    return (maxLen - distance) / maxLen;
+  }
+
+  function buildKnownMap(items) {
+    const map = new Map();
+    const unknown = [];
+
+    for (const item of items) {
+      if (item.known && item.normalizedCode) {
+        if (!map.has(item.normalizedCode)) {
+          map.set(item.normalizedCode, { ...item, duplicates: [] });
+        } else {
+          map.get(item.normalizedCode).duplicates.push(item.raw);
+        }
+      } else {
+        unknown.push(item);
+      }
+    }
+
+    return { map, unknown };
+  }
+
+  function buildBaseLookup(map) {
+    const lookup = new Map();
+    for (const [normalizedCode, item] of map.entries()) {
+      if (item.baseCode && !lookup.has(item.baseCode)) {
+        lookup.set(item.baseCode, normalizedCode);
+      }
+    }
+    return lookup;
+  }
+
+  function preferredDescription(previousItem, currentItem) {
+    return currentItem.description || previousItem.description || "";
+  }
+
+  function makeResult(status, normalizedCode, previousItem, currentItem, notes, extra) {
+    const edition = status === "Edition Changed"
+      ? `${window.ComparatorParser.formatEdition(previousItem.edition)} -> ${window.ComparatorParser.formatEdition(currentItem.edition)}`
+      : window.ComparatorParser.formatEdition((currentItem || previousItem || {}).edition || "");
+
+    // Prefer the parser item's own displayCode (preserves spaces/formatting e.g. "IL T8 01 (10/93)")
+    // Fall back to displayFormCode() only for standard compact codes (e.g. "ILT00211")
+    const activeItem = currentItem || previousItem;
+    const displayCode = (activeItem && activeItem.displayCode)
+      ? activeItem.displayCode
+      : (normalizedCode ? window.ComparatorParser.displayFormCode(normalizedCode) : "");
+
+    // Surface duplicate raw lines that collapsed into this same normalized code,
+    // so a repeated form on the schedule isn't silently dropped from the comparison.
+    const dupCount =
+      (previousItem && previousItem.duplicates ? previousItem.duplicates.length : 0) +
+      (currentItem && currentItem.duplicates ? currentItem.duplicates.length : 0);
+
+    return {
+      status,
+      normalizedCode: normalizedCode || "",
+      displayCode,
+      originalPrevious: previousItem ? previousItem.raw : "",
+      originalCurrent: currentItem ? currentItem.raw : "",
+      description: previousItem && currentItem ? preferredDescription(previousItem, currentItem) : ((currentItem || previousItem || {}).description || ""),
+      edition,
+      notes,
+      source: (activeItem || {}).source,
+      duplicateCount: dupCount,
+      duplicateLines: [
+        ...((previousItem && previousItem.duplicates) || []),
+        ...((currentItem && currentItem.duplicates) || []),
+      ],
+      // 0-1 similarity score when this row came from fuzzy/description matching; null for exact matches.
+      confidence: extra && typeof extra.confidence === "number" ? extra.confidence : null,
+      manual: !!(extra && extra.manual),
+    };
+  }
+
+
+  function compareSchedules(previousItems, currentItems) {
+    const previous = buildKnownMap(previousItems);
+    const current = buildKnownMap(currentItems);
+    const currentBaseLookup = buildBaseLookup(current.map);
+    const previousBaseLookup = buildBaseLookup(previous.map);
+    const matchedCurrentCodes = new Set();
+    const matchedPreviousCodes = new Set();
+    const results = [];
+
+    // Pass 1: Exact matches (same code and edition)
+    for (const [previousCode, previousItem] of previous.map.entries()) {
+      if (current.map.has(previousCode)) {
+        const currentItem = current.map.get(previousCode);
+        matchedCurrentCodes.add(previousCode);
+        matchedPreviousCodes.add(previousCode);
+        const sim = getSimilarity(previousItem.description, currentItem.description);
+
+        if (sim === 1.0) {
+          results.push(makeResult("Match", previousCode, previousItem, currentItem, "Exact form, edition and description match.", { confidence: sim }));
+        } else if (sim >= 0.85) {
+          results.push(makeResult("Possible Typo", previousCode, previousItem, currentItem, `Possible description typo (${Math.round(sim * 100)}% similar).`, { confidence: sim }));
+        } else {
+          results.push(makeResult("Description Changed", previousCode, previousItem, currentItem, `Description updated (${Math.round(sim * 100)}% similar).`, { confidence: sim }));
+        }
+      }
+    }
+
+    // Pass 2: BaseCode matches (Edition Changed)
+    for (const [previousCode, previousItem] of previous.map.entries()) {
+      if (matchedPreviousCodes.has(previousCode)) continue;
+
+      if (currentBaseLookup.has(previousItem.baseCode)) {
+        const currentCode = currentBaseLookup.get(previousItem.baseCode);
+        if (!matchedCurrentCodes.has(currentCode)) {
+          const currentItem = current.map.get(currentCode);
+          matchedCurrentCodes.add(currentCode);
+          matchedPreviousCodes.add(previousCode);
+          results.push(makeResult("Edition Changed", currentItem.normalizedCode, previousItem, currentItem, "Same form number with a different edition."));
+        }
+      }
+    }
+
+    // Pass 3: Fuzzy description matching for unmatched forms (e.g. CG20110413 vs CG20101219)
+    for (const [previousCode, previousItem] of previous.map.entries()) {
+      if (matchedPreviousCodes.has(previousCode)) continue;
+
+      let bestScore = -1;
+      let bestCurrentCode = null;
+
+      for (const [currentCode, currentItem] of current.map.entries()) {
+        if (matchedCurrentCodes.has(currentCode)) continue;
+
+        const descSim = getSimilarity(previousItem.description, currentItem.description);
+        const codeSim = getSimilarity(previousItem.baseCode, currentItem.baseCode);
+
+        // Strong candidate if description matches exactly, or description is very similar AND code is similar
+        if (descSim === 1.0 || (descSim >= 0.80 && codeSim >= 0.60)) {
+          const score = descSim * 0.7 + codeSim * 0.3;
+          if (score > bestScore) {
+            bestScore = score;
+            bestCurrentCode = currentCode;
+          }
+        }
+      }
+
+      if (bestCurrentCode) {
+        const currentItem = current.map.get(bestCurrentCode);
+        matchedCurrentCodes.add(bestCurrentCode);
+        matchedPreviousCodes.add(previousCode);
+
+        const descSim = getSimilarity(previousItem.description, currentItem.description);
+        const codeDiffers = previousItem.baseCode !== currentItem.baseCode;
+        const editDiffers = previousItem.edition !== currentItem.edition;
+
+        let status = "Edition Changed";
+        let note = "Form code or edition updated.";
+
+        if (codeDiffers && descSim === 1.0) {
+          status = "Edition Changed";
+          note = `Form code updated from ${window.ComparatorParser.displayFormCode(previousItem.normalizedCode)} (descriptions match).`;
+        } else if (descSim >= 0.85) {
+          status = "Possible Typo";
+          note = `Possible form number/description discrepancy (${Math.round(descSim * 100)}% description similarity).`;
+        } else {
+          status = "Description Changed";
+          note = `Form updated (${Math.round(descSim * 100)}% description similarity).`;
+        }
+
+        results.push(makeResult(status, currentItem.normalizedCode, previousItem, currentItem, note, { confidence: descSim }));
+      }
+    }
+
+    // Pass 4: Remaining unmatched previous items are Removed
+    for (const [previousCode, previousItem] of previous.map.entries()) {
+      if (!matchedPreviousCodes.has(previousCode)) {
+        results.push(makeResult("Removed", previousCode, previousItem, null, "Present in Previous only."));
+      }
+    }
+
+    // Pass 5: Remaining unmatched current items are Added
+    for (const [currentCode, currentItem] of current.map.entries()) {
+      if (!matchedCurrentCodes.has(currentCode)) {
+        results.push(makeResult("Added", currentCode, null, currentItem, "Present in Current only."));
+      }
+    }
+
+    for (const item of previous.unknown) {
+      results.push({
+        status: "Unknown Format",
+        normalizedCode: item.clean,
+        displayCode: item.clean,
+        originalPrevious: item.raw,
+        originalCurrent: "",
+        description: item.description || "",
+        edition: window.ComparatorParser.formatEdition(item.edition),
+        notes: "Review raw Previous input.",
+      });
+    }
+
+    for (const item of current.unknown) {
+      results.push({
+        status: "Unknown Format",
+        normalizedCode: item.clean,
+        displayCode: item.clean,
+        originalPrevious: "",
+        originalCurrent: item.raw,
+        description: item.description || "",
+        edition: window.ComparatorParser.formatEdition(item.edition),
+        notes: "Review raw Current input.",
+      });
+    }
+
+    return {
+      results,
+      previousKnownCount: previous.map.size,
+      currentKnownCount: current.map.size,
+      previousCount: previousItems.length,
+      currentCount: currentItems.length,
+      unknownCount: previous.unknown.length + current.unknown.length,
+    };
+  }
+
+  /**
+   * Manually merge two unmatched result rows (e.g. an "Added" row and a "Removed" row,
+   * or either paired with an "Unknown Format" row) that a human reviewer has confirmed
+   * are the same form. Used when the automatic matching passes in compareSchedules()
+   * pick the wrong pairing or miss one entirely (see Pass 3's greedy-match limitation).
+   * Returns a new result object with status "Manually Linked"; does not mutate inputs.
+   */
+  function linkManualPair(rowA, rowB) {
+    if (!rowA || !rowB) throw new Error("linkManualPair requires two rows");
+
+    const prevRow = rowA.originalPrevious ? rowA : (rowB.originalPrevious ? rowB : null);
+    const currRow = rowA.originalCurrent ? rowA : (rowB.originalCurrent ? rowB : null);
+
+    const displayCode = (currRow || prevRow || rowA).displayCode || rowA.displayCode || rowB.displayCode;
+    const description = (currRow && currRow.description) || (prevRow && prevRow.description) || rowA.description || rowB.description;
+
+    let edition = "";
+    if (prevRow && currRow && prevRow.edition !== currRow.edition) {
+      edition = `${prevRow.edition || ""} -> ${currRow.edition || ""}`;
+    } else {
+      edition = (currRow || prevRow || rowA).edition || "";
+    }
+
+    return {
+      status: "Manually Linked",
+      normalizedCode: (currRow || prevRow || rowA).normalizedCode || "",
+      displayCode,
+      originalPrevious: (prevRow && prevRow.originalPrevious) || "",
+      originalCurrent: (currRow && currRow.originalCurrent) || "",
+      description,
+      edition,
+      notes: "Manually linked by reviewer — verify this is the same form before relying on it.",
+      source: (currRow || prevRow || rowA).source,
+      duplicateCount: 0,
+      duplicateLines: [],
+      confidence: null,
+      manual: true,
+    };
+  }
+
+  window.ComparatorEngine = {
+    compareSchedules,
+    linkManualPair,
+  };
+})();
+
+
+</script>
+    <script>
+(function () {
+  /* ── SAMPLES ─────────────────────────────────────────── */
+  const samples = {
+    previous: [
+      "CG20100413 ADDITIONAL INSURED - OWNERS, LESSEES OR CONTRACTORS",
+      "CG 20 37 (04/13) ADDITIONAL INSURED - OWNERS, LESSEES OR CONTRACTORS - COMPLETED OPERATIONS",
+      "IL00171198 COMMON POLICY CONDITIONS",
+      "CA 00 01 10/13 BUSINESS AUTO COVERAGE FORM",
+      "CP00100695 BUILDING AND PERSONAL PROPERTY COVERAGE FORM",
+      "WEIRD OCR LINE WITHOUT A FORM NUMBER",
+    ].join("\n"),
+    current: [
+      "CG 20 10 (12/19) ADDITIONAL INSURED - OWNERS, LESSEES OR CONTRACTORS",
+      "CG 20 37 (04/13) ADDITIONAL INSURED - OWNERS, LESSEES OR CONTRACTORS - COMPLETED OPERATIONS",
+      "IL 00 17 (11/98) COMMON POLICY CONDITIONS",
+      "CA00011013 BUSINESS AUTO COVERAGE FORM",
+      "BP 00 03 07/13 BUSINESSOWNERS COVERAGE FORM",
+      "OCR? CP FORM BADLY SCANNED",
+    ].join("\n"),
+    quote: [
+      "CG 20 10 (12/19) ADDITIONAL INSURED - OWNERS, LESSEES OR CONTRACTORS",
+      "CG 20 37 (04/13) ADDITIONAL INSURED - OWNERS, LESSEES OR CONTRACTORS - COMPLETED OPERATIONS",
+      "BP 00 03 07/13 BUSINESSOWNERS COVERAGE FORM",
+    ].join("\n"),
+  };
+
+  /* ── STATE ────────────────────────────────────────────── */
+  const state = {
+    prefixes: window.ComparatorParser.defaultPrefixes.slice(),
+    previousItems: [], currentItems: [], quoteItems: [], fourthItems: [],
+    results: [], checklistRows: [],
+    collapsedGroups: new Set(),
+    // v2.0
+    filters: { Match: true, Added: true, Removed: true, "Edition Changed": true, "Description Changed": true, "Possible Typo": true, "Unknown Format": true },
+    searchQuery: "",
+    diffsOnly: false,
+    sideBySide: false,
+    pinnedCodes: new Set(),
+    rowNotes: new Map(),       // normalizedCode -> string
+    customEdits: new Map(),    // normalizedCode -> { displayCode?, description? }
+    undoSnapshot: null,
+    linkPending: null,         // _id of the first row picked for manual re-pair, or null
+  };
+
+  const draftKey = "formsComparatorDraftV1";
+  let draftTimer = null;
+  let noteTarget = null;
+
+  // Analytics shorthand — analytics.js may not be loaded (e.g. running the
+  // plain offline build), so this is always safe to call.
+  function T(event, data) {
+    if (window.ComparatorAnalytics) window.ComparatorAnalytics.track(event, data);
+  }
+  T("session_start", { ua: navigator.userAgent, lang: navigator.language });
+
+  /* ── ELEMENT REFS ─────────────────────────────────────── */
+  const el = {
+    previousInput:      document.getElementById("previousInput"),
+    currentInput:       document.getElementById("currentInput"),
+    quoteInput:         document.getElementById("quoteInput"),
+    fourthInput:        document.getElementById("fourthInput"),
+    previousPreview:    document.getElementById("previousPreview"),
+    currentPreview:     document.getElementById("currentPreview"),
+    quotePreview:       document.getElementById("quotePreview"),
+    fourthPreview:      document.getElementById("fourthPreview"),
+    resultsBody:        document.getElementById("resultsBody"),
+    sbsBody:            document.getElementById("sbsBody"),
+    excelChecklistBody: document.getElementById("excelChecklistBody"),
+    resultViewSelect:   document.getElementById("resultViewSelect"),
+    prefixInput:        document.getElementById("prefixInput"),
+    lastCompared:       document.getElementById("lastCompared"),
+    comparisonTime:     document.getElementById("comparisonTime"),
+    pieChart:           document.getElementById("pieChart"),
+    barChart:           document.getElementById("barChart"),
+    offlineStatus:      document.getElementById("offlineStatus"),
+    themeToggleBtn:     document.getElementById("themeToggleBtn"),
+    memoryStatus:       document.getElementById("memoryStatus"),
+    resultsTableWrap:   document.getElementById("resultsTableWrap"),
+    sbsWrap:            document.getElementById("sbsWrap"),
+    resultsSearch:      document.getElementById("resultsSearch"),
+    diffsOnlyBtn:       document.getElementById("diffsOnlyBtn"),
+    sideBySideBtn:      document.getElementById("sideBySideBtn"),
+    undoToast:          document.getElementById("undoToast"),
+    smartExportModal:   document.getElementById("smartExportModal"),
+    noteDialog:         document.getElementById("noteDialog"),
+    noteCodeBadge:      document.getElementById("noteCodeBadge"),
+    noteTextarea:       document.getElementById("noteTextarea"),
+    exportScopeNote:    document.getElementById("exportScopeNote"),
+  };
+
+  const metricIds = {
+    Previous: "metricPrevious", Current: "metricCurrent",
+    Match: "metricMatch", Added: "metricAdded", Removed: "metricRemoved",
+    "Edition Changed": "metricChanged", "Description Changed": "metricDescChanged",
+    "Possible Typo": "metricTypo", "Unknown Format": "metricUnknown",
+    Completion: "metricCompletion",
+  };
+
+  /* ── UTILS ────────────────────────────────────────────── */
+  function statusClass(status) {
+    return `status-${status.toLowerCase().replace(/\s+/g, "-")}`;
+  }
+
+  function esc(v) {
+    return String(v || "")
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+  }
+
+  function highlight(text, q) {
+    if (!q) return esc(text);
+    const safe = esc(text);
+    const safeQ = esc(q).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    if (!safeQ) return safe;
+    return safe.replace(new RegExp(`(${safeQ})`, "gi"), '<make class="hl">$1</make>').replace(/<make/g, "<mark").replace(/\/make>/g, "/mark>");
+  }
+
+  function diffHighlight(prevText, currText, q) {
+    if (!prevText || !currText) {
+      return {
+        prev: highlight(prevText || "", q),
+        curr: highlight(currText || "", q)
+      };
+    }
+
+    const tokensA = prevText.split(/(\s+)/);
+    const tokensB = currText.split(/(\s+)/);
+
+    const wordsA = [];
+    const wordsB = [];
+
+    tokensA.forEach((tok, idx) => {
+      if (/\S/.test(tok)) wordsA.push({ text: tok, idx });
+    });
+    tokensB.forEach((tok, idx) => {
+      if (/\S/.test(tok)) wordsB.push({ text: tok, idx });
+    });
+
+    const dp = Array(wordsA.length + 1).fill(null).map(() => Array(wordsB.length + 1).fill(0));
+    for (let i = 1; i <= wordsA.length; i++) {
+      for (let j = 1; j <= wordsB.length; j++) {
+        if (wordsA[i - 1].text.toUpperCase() === wordsB[j - 1].text.toUpperCase()) {
+          dp[i][j] = dp[i - 1][j - 1] + 1;
+        } else {
+          dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+        }
+      }
+    }
+
+    let i = wordsA.length, j = wordsB.length;
+    const matchA = new Set();
+    const matchB = new Set();
+    while (i > 0 && j > 0) {
+      if (wordsA[i - 1].text.toUpperCase() === wordsB[j - 1].text.toUpperCase()) {
+        matchA.add(wordsA[i - 1].idx);
+        matchB.add(wordsB[j - 1].idx);
+        i--; j--;
+      } else if (dp[i - 1][j] >= dp[i][j - 1]) {
+        i--;
+      } else {
+        j--;
+      }
+    }
+
+    const resA = tokensA.map((tok, idx) => {
+      if (!/\S/.test(tok)) return esc(tok);
+      const isMatched = matchA.has(idx);
+      const formatted = highlight(tok, q);
+      return isMatched ? formatted : `<span class="diff-removed-inline">${formatted}</span>`;
+    }).join("");
+
+    const resB = tokensB.map((tok, idx) => {
+      if (!/\S/.test(tok)) return esc(tok);
+      const isMatched = matchB.has(idx);
+      const formatted = highlight(tok, q);
+      return isMatched ? formatted : `<span class="diff-added-inline">${formatted}</span>`;
+    }).join("");
+
+    return { prev: resA, curr: resB };
+  }
+
+  function flashBtn(id, done, orig) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.textContent = done;
+    window.setTimeout(() => { btn.textContent = orig; }, 1600);
+  }
+
+  /* ── FILTER LOGIC ─────────────────────────────────────── */
+  function baseRows() {
+    const src = el.resultViewSelect.value;
+    return src === "all" ? state.results : state.results.filter(r => (r.source || "Current Policy") === src);
+  }
+
+  function getFiltered() {
+    let rows = baseRows();
+    if (state.diffsOnly) rows = rows.filter(r => r.status !== "Match");
+    rows = rows.filter(r => state.filters[r.status] !== false);
+    if (state.searchQuery) {
+      const q = state.searchQuery.toLowerCase();
+      rows = rows.filter(r =>
+        (r.normalizedCode || "").toLowerCase().includes(q) ||
+        (r.displayCode || "").toLowerCase().includes(q) ||
+        (r.description || "").toLowerCase().includes(q) ||
+        (r.originalPrevious || "").toLowerCase().includes(q) ||
+        (r.originalCurrent || "").toLowerCase().includes(q) ||
+        (r.status || "").toLowerCase().includes(q) ||
+        (state.rowNotes.get(r.normalizedCode) || "").toLowerCase().includes(q)
+      );
+    }
+    const pinned = rows.filter(r => state.pinnedCodes.has(r.normalizedCode));
+    const rest   = rows.filter(r => !state.pinnedCodes.has(r.normalizedCode));
+    return [...pinned, ...rest];
+  }
+
+  function updateFilterCounts() {
+    const rows = baseRows();
+    const c = { Match: 0, Added: 0, Removed: 0, "Edition Changed": 0, "Description Changed": 0, "Possible Typo": 0, "Unknown Format": 0 };
+    rows.forEach(r => { if (c[r.status] !== undefined) c[r.status]++; });
+    document.getElementById("cntMatch").textContent   = `(${c.Match})`;
+    document.getElementById("cntAdded").textContent   = `(${c.Added})`;
+    document.getElementById("cntRemoved").textContent = `(${c.Removed})`;
+    document.getElementById("cntChanged").textContent = `(${c["Edition Changed"]})`;
+    document.getElementById("cntDescChanged").textContent = `(${c["Description Changed"]})`;
+    document.getElementById("cntTypo").textContent   = `(${c["Possible Typo"]})`;
+    document.getElementById("cntUnknown").textContent = `(${c["Unknown Format"]})`;
+    updateScopeNote();
+  }
+
+  function updateScopeNote() {
+    const src = el.resultViewSelect.value;
+    const label = src === "all" ? "All documents" : displaySrcName(src);
+    const visible = getFiltered().length;
+    const total = baseRows().length;
+    el.exportScopeNote.textContent = `View: ${label} — ${visible} of ${total} rows visible.`;
+  }
+
+  /* ── RENDER PREVIEW ───────────────────────────────────── */
+  function renderPreview(tbody, items) {
+    tbody.innerHTML = items.length
+      ? items.map(i => `<tr class="${statusClass(i.parseStatus)}"><td>${esc(i.parseStatus)}</td><td>${esc(i.displayCode)}</td><td>${esc(i.displayEdition)}</td><td>${esc(i.description)}</td></tr>`).join("")
+      : `<tr><td colspan="4">No parsed rows yet.</td></tr>`;
+  }
+
+  /* ── RENDER RESULTS ───────────────────────────────────── */
+  function renderResults() {
+    if (state.sideBySide) { renderSBS(); return; }
+    el.resultsTableWrap.classList.remove("hidden");
+    el.sbsWrap.classList.add("hidden");
+
+    const rows = getFiltered();
+    updateFilterCounts();
+
+    if (!rows.length) {
+      el.resultsBody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:24px;">No results match the current filters. Adjust filters or run a comparison.</td></tr>`;
+      return;
+    }
+
+    const src = el.resultViewSelect.value;
+    if (src === "all") {
+      const groups = groupBySource(rows);
+      el.resultsBody.innerHTML = groups.map(({ source, rows: gr }) => {
+        const collapsed = state.collapsedGroups.has(source);
+        const cnt = summarize(gr);
+        const meta = `${gr.length} rows | ${cnt.Match||0} match | ${cnt.Added||0} added | ${cnt.Removed||0} removed | ${cnt["Edition Changed"]||0} revised | ${cnt["Unknown Format"]||0} unknown`;
+        return `<tr class="result-group-row"><td colspan="9">
+            <button class="result-group-button" type="button" data-group="${esc(source)}">${collapsed ? "▶" : "▼"} ${esc(displaySrcName(source))}</button>
+            <span class="result-group-meta">${esc(meta)}</span>
+          </td></tr>
+          ${collapsed ? "" : gr.map(resultRowHtml).join("")}`;
+      }).join("");
+      return;
+    }
+    el.resultsBody.innerHTML = rows.map(resultRowHtml).join("");
+  }
+
+  // Statuses where a row might be the "other half" of a form the auto-matcher missed
+  // or mismatched — these are the only ones eligible for manual re-pairing.
+  const LINKABLE_STATUSES = new Set(["Added", "Removed", "Unknown Format"]);
+
+  function linkButtonHtml(item) {
+    if (!LINKABLE_STATUSES.has(item.status)) return "";
+    const isPending = state.linkPending === item._id;
+    const title = isPending
+      ? "Click another Added/Removed/Unknown row to link them together"
+      : "Mark as the same form as another row (fixes a missed or wrong auto-match)";
+    return `<button class="link-btn${isPending ? " on" : ""}" type="button" data-link="${esc(item._id)}" title="${esc(title)}">${isPending ? "🔗" : "⛓"}</button>`;
+  }
+
+  function duplicateBadgeHtml(item) {
+    if (!item.duplicateCount) return "";
+    const lines = (item.duplicateLines || []).map(esc).join(" | ");
+    return `<span class="dup-badge" title="Repeated on the schedule but collapsed into this row: ${lines}">⚠ ×${item.duplicateCount + 1}</span>`;
+  }
+
+  function confidenceBadgeHtml(item) {
+    if (item.confidence === null || item.confidence === undefined) return "";
+    const pct = Math.round(item.confidence * 100);
+    return `<span class="conf-badge" title="Description similarity score">${pct}%</span>`;
+  }
+
+  function resultRowHtml(item) {
+    const code    = item.normalizedCode || "";
+    const pinned  = state.pinnedCodes.has(code);
+    const hasNote = state.rowNotes.has(code) && state.rowNotes.get(code).trim();
+    const edit    = state.customEdits.get(code) || {};
+    const dispCode = edit.displayCode !== undefined ? edit.displayCode : (item.displayCode || item.normalizedCode);
+    const desc     = edit.description !== undefined ? edit.description : item.description;
+    const q = state.searchQuery;
+    const diffs = diffHighlight(item.originalPrevious, item.originalCurrent, q);
+    const rowClasses = [statusClass(item.status), pinned ? "row-pinned" : "", item.manual ? "row-manual" : ""].filter(Boolean).join(" ");
+    return `<tr class="${rowClasses}" data-code="${esc(code)}"${item._id ? ` data-id="${esc(item._id)}"` : ""}>
+      <td>${esc(item.status)} ${duplicateBadgeHtml(item)}${confidenceBadgeHtml(item)}</td>
+      <td>${esc(item.source || "Current Policy")}</td>
+      <td><span contenteditable="true" data-field="displayCode" data-code="${esc(code)}">${highlight(dispCode, q)}</span></td>
+      <td>${diffs.prev}</td>
+      <td>${diffs.curr}</td>
+      <td><span contenteditable="true" data-field="description" data-code="${esc(code)}">${highlight(desc, q)}</span></td>
+      <td>${esc(item.edition)}</td>
+      <td>${esc(item.notes)}</td>
+      <td class="row-actions-td">
+        ${linkButtonHtml(item)}
+        <button class="pin-btn${pinned ? " on" : ""}" type="button" data-pin="${esc(code)}" title="${pinned ? "Unpin" : "Pin to top"}">${pinned ? "⭐" : "☆"}</button>
+        <button class="note-btn${hasNote ? " on" : ""}" type="button" data-note="${esc(code)}" title="${hasNote ? "Edit note" : "Add note"}">${hasNote ? "📝" : "🖊"}</button>
+      </td>
+    </tr>`;
+  }
+
+  /* ── SIDE-BY-SIDE ─────────────────────────────────────── */
+  function renderSBS() {
+    el.resultsTableWrap.classList.add("hidden");
+    el.sbsWrap.classList.remove("hidden");
+    const rows = getFiltered();
+    updateFilterCounts();
+    if (!rows.length) {
+      el.sbsBody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px;">No results. Run a comparison first.</td></tr>`;
+      return;
+    }
+    el.sbsBody.innerHTML = rows.map(item => {
+      const code = item.normalizedCode || "";
+      const pinned = state.pinnedCodes.has(code);
+      const hasNote = state.rowNotes.has(code) && state.rowNotes.get(code).trim();
+      let prev = "", curr = "";
+      switch (item.status) {
+        case "Match":
+          prev = esc(item.originalPrevious || item.displayCode);
+          curr = esc(item.originalCurrent  || item.displayCode);
+          break;
+        case "Removed":
+          prev = `<span class="sbs-removed">${esc(item.originalPrevious || item.displayCode)}</span>`;
+          curr = `<span class="sbs-empty">— not present —</span>`;
+          break;
+        case "Added":
+          prev = `<span class="sbs-empty">— not present —</span>`;
+          curr = `<span class="sbs-added">${esc(item.originalCurrent || item.displayCode)}</span>`;
+          break;
+        case "Edition Changed":
+        case "Description Changed":
+        case "Possible Typo":
+          const sbsDiff = diffHighlight(item.originalPrevious, item.originalCurrent, "");
+          prev = `<span class="sbs-changed">${sbsDiff.prev}</span>`;
+          curr = `<span class="sbs-changed">${sbsDiff.curr}</span>`;
+          break;
+        default:
+          prev = esc(item.originalPrevious || item.displayCode);
+          curr = esc(item.originalCurrent  || item.displayCode);
+      }
+      return `<tr class="${statusClass(item.status)}${pinned ? " row-pinned" : ""}" data-code="${esc(code)}">
+        <td>${esc(item.status)}</td>
+        <td>${prev}</td>
+        <td>${curr}</td>
+        <td class="row-actions-td">
+          <button class="pin-btn${pinned ? " on" : ""}" type="button" data-pin="${esc(code)}">${pinned ? "⭐" : "☆"}</button>
+          <button class="note-btn${hasNote ? " on" : ""}" type="button" data-note="${esc(code)}">${hasNote ? "📝" : "🖊"}</button>
+        </td>
+      </tr>`;
+    }).join("");
+  }
+
+  /* ── GROUP HELPERS ────────────────────────────────────── */
+  function groupBySource(rows) {
+    const order = ["Current Policy", "Quote / 3rd Document", "4th Document"];
+    return order
+      .map(src => ({ source: src, rows: rows.filter(r => (r.source || "Current Policy") === src) }))
+      .filter(g => g.rows.length);
+  }
+
+  function displaySrcName(src) {
+    return src === "Quote / 3rd Document" ? "3rd Document" : src;
+  }
+
+  /* ── CHECKLIST ────────────────────────────────────────── */
+  function checklistStatus(s) { return s === "Edition Changed" ? "Revised" : s; }
+
+  function formDescription(row) {
+    const edit = state.customEdits.get(row.normalizedCode) || {};
+    // When toggled to "previous", use originalPrevious if available
+    let rawCode;
+    if (typeof checklistView !== "undefined" && checklistView === "previous" && row.originalPrevious) {
+      rawCode = row.originalPrevious;
+    } else {
+      rawCode = edit.displayCode !== undefined ? edit.displayCode : (row.displayCode || row.normalizedCode || "");
+    }
+    // Strip trailing edition suffix like "(10/93)" or "(09/11)" from the display code
+    // so the edition appears only in its own column
+    const code = rawCode.replace(/\s*\(\d{1,2}\/\d{2,4}\)\s*$/, "").trim();
+    const desc = edit.description !== undefined ? edit.description : row.description;
+    return [code, desc].filter(Boolean).join(" ") || row.normalizedCode || "";
+  }
+
+
+  function checklistEdition(v) {
+    let e = String(v || "").trim();
+    if (e.includes("->")) e = e.split("->").pop().trim();
+    if (!e) return "";
+    return e.startsWith("(") ? e : `(${e})`;
+  }
+
+  function makeChecklistRows(results) {
+    return results
+      .filter(r => r.status !== "Unknown Format")
+      .map(r => ({
+        formDescription: formDescription(r),
+        edition: checklistEdition(r.edition),
+        status: checklistStatus(r.status),
+        source: r.source || "Current Policy",
+        normalizedCode: r.normalizedCode,
+        displayCode: r.displayCode || r.normalizedCode,
+        originalPrevious: r.originalPrevious,
+        originalCurrent: r.originalCurrent,
+        description: r.description,
+      }));
+  }
+
+  function renderChecklist() {
+    const src = el.resultViewSelect.value;
+    const rows = src === "all" ? state.checklistRows : state.checklistRows.filter(r => r.source === src);
+    el.excelChecklistBody.innerHTML = rows.length
+      ? rows.map(r => {
+          const cv = v => esc(v || "");
+          return `<tr class="${statusClass(r.status)}">
+            <td class="cell-copy" data-copy-val="${cv(r.formDescription)}">${cv(r.formDescription)}</td>
+            <td class="cell-copy" data-copy-val="${cv(r.edition)}">${cv(r.edition)}</td>
+            <td class="cell-copy" data-copy-val="${cv(r.status)}">${cv(r.status)}</td>
+            <td class="cell-copy" data-copy-val="${cv(r.source)}">${cv(r.source)}</td>
+          </tr>`;
+        }).join("")
+      : `<tr><td colspan="4">Run a comparison to generate Excel-ready rows.</td></tr>`;
+  }
+
+  /* ── METRICS ──────────────────────────────────────────── */
+  function summarize(results) {
+    return results.reduce((acc, r) => { acc[r.status] = (acc[r.status] || 0) + 1; return acc; }, {});
+  }
+
+  function updateMetrics(summary, meta) {
+    const total = Math.max(1, state.results.length);
+    const known = (summary.Match||0) + (summary.Added||0) + (summary.Removed||0) + (summary["Edition Changed"]||0) + (summary["Description Changed"]||0) + (summary["Possible Typo"]||0) + (summary["Manually Linked"]||0);
+    const completion = Math.round((known / total) * 100);
+    const vals = {
+      Previous: meta ? meta.previousCount : state.previousItems.length,
+      Current: meta ? meta.currentCount : state.currentItems.length,
+      Match: summary.Match || 0,
+      Added: summary.Added || 0,
+      Removed: summary.Removed || 0,
+      "Edition Changed": summary["Edition Changed"] || 0,
+      "Description Changed": summary["Description Changed"] || 0,
+      "Possible Typo": summary["Possible Typo"] || 0,
+      "Unknown Format": summary["Unknown Format"] || 0,
+      Completion: `${state.results.length ? completion : 0}%`,
+    };
+    for (const [key, id] of Object.entries(metricIds)) {
+      document.getElementById(id).textContent = vals[key];
+    }
+  }
+
+  /* ── PARSE HELPERS ────────────────────────────────────── */
+  function cleanPrevious() {
+    state.prefixes = window.ComparatorParser.parsePrefixes(el.prefixInput.value);
+    state.previousItems = window.ComparatorParser.parseSchedule(el.previousInput.value, state.prefixes);
+    renderPreview(el.previousPreview, state.previousItems);
+    updateMetrics(summarize(state.results), null);
+  }
+  function cleanCurrent() {
+    state.prefixes = window.ComparatorParser.parsePrefixes(el.prefixInput.value);
+    state.currentItems = window.ComparatorParser.parseSchedule(el.currentInput.value, state.prefixes);
+    renderPreview(el.currentPreview, state.currentItems);
+    updateMetrics(summarize(state.results), null);
+  }
+  function cleanQuote() {
+    state.prefixes = window.ComparatorParser.parsePrefixes(el.prefixInput.value);
+    state.quoteItems = window.ComparatorParser.parseSchedule(el.quoteInput.value, state.prefixes);
+    renderPreview(el.quotePreview, state.quoteItems);
+  }
+  function cleanFourth() {
+    state.prefixes = window.ComparatorParser.parsePrefixes(el.prefixInput.value);
+    state.fourthItems = window.ComparatorParser.parseSchedule(el.fourthInput.value, state.prefixes);
+    renderPreview(el.fourthPreview, state.fourthItems);
+  }
+
+  /* ── COMPARE ──────────────────────────────────────────── */
+  function compareAgainst(label, items) {
+    const cmp = window.ComparatorEngine.compareSchedules(state.previousItems, items);
+    cmp.results.forEach(r => {
+      r.source = label;
+      if (label !== "Current Policy") r.notes = `${label}: ${r.notes}`;
+    });
+    return cmp;
+  }
+
+  function compare() {
+    const t0 = performance.now();
+    cleanPrevious(); cleanCurrent();
+    if (!document.getElementById("quotePane").classList.contains("hidden")) cleanQuote();
+    if (!document.getElementById("fourthPane").classList.contains("hidden")) cleanFourth();
+
+    const cmps = [compareAgainst("Current Policy", state.currentItems)];
+    if (state.quoteItems.length)  cmps.push(compareAgainst("Quote / 3rd Document", state.quoteItems));
+    if (state.fourthItems.length) cmps.push(compareAgainst("4th Document", state.fourthItems));
+
+    state.results = cmps.flatMap(c => c.results);
+    state.results.forEach((r, i) => { r._id = `row${i}`; });
+    state.linkPending = null;
+    state.checklistRows = makeChecklistRows(state.results);
+    const summary = summarize(state.results);
+    renderResults();
+    renderChecklist();
+    updateMetrics(summary, cmps[0]);
+    updateFilterCounts();
+    drawCharts(summary);
+    el.comparisonTime.textContent = `${((performance.now() - t0) / 1000).toFixed(2)} sec`;
+    el.lastCompared.textContent = new Date().toLocaleString();
+    saveDraft();
+
+    T("compare_run", {
+      previousCount: state.previousItems.length,
+      currentCount: state.currentItems.length,
+      docsCompared: cmps.length,
+      statusCounts: summary,
+      durationMs: Math.round(performance.now() - t0),
+      // The actual raw text of anything the parser couldn't handle — this is
+      // the highest-value signal for improving parser.js regex coverage.
+      unknownLines: state.results.filter(r => r.status === "Unknown Format").map(r => r.originalCurrent || r.originalPrevious || r.normalizedCode),
+      duplicateLines: state.results.filter(r => r.duplicateCount).flatMap(r => r.duplicateLines),
+    });
+  }
+
+  function drawCharts(summary) {
+    const data = [
+      ["Match",               summary.Match || 0,                    "#15803d"],
+      ["Added",               summary.Added || 0,                    "#ca8a04"],
+      ["Removed",             summary.Removed || 0,                  "#dc2626"],
+      ["Edition Changed",     summary["Edition Changed"] || 0,       "#ea580c"],
+      ["Desc Changed",        summary["Description Changed"] || 0,   "#8b5cf6"],
+      ["Possible Typo",       summary["Possible Typo"] || 0,         "#d946ef"],
+      ["Unknown",             summary["Unknown Format"] || 0,        "#64748b"],
+    ];
+    drawPie(el.pieChart, data);
+    drawBars(el.barChart, data);
+  }
+
+  function drawPie(canvas, data) {
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const total = data.reduce((s, d) => s + d[1], 0);
+    const cx = 98, cy = 112, r = 74;
+    let angle = -Math.PI / 2;
+    if (!total) {
+      ctx.fillStyle = "#e5e7eb";
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+    } else {
+      for (const [, v, col] of data) {
+        const slice = (v / total) * Math.PI * 2;
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, angle, angle + slice); ctx.closePath();
+        ctx.fillStyle = col; ctx.fill(); angle += slice;
+      }
+    }
+    const isDark = document.documentElement.dataset.theme === "dark";
+    data.forEach((d, i) => {
+      const y = 32 + i * 26;
+      ctx.fillStyle = d[2]; ctx.fillRect(200, y - 10, 12, 12);
+      ctx.fillStyle = isDark ? "#e5eefb" : "#172033";
+      ctx.font = "12px Segoe UI, Arial";
+      ctx.fillText(`${d[0]}: ${d[1]}`, 220, y + 1);
+    });
+  }
+
+  function drawBars(canvas, data) {
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const max = Math.max(1, ...data.map(d => d[1]));
+    const left = 132, top = 16, rh = 28, barMax = canvas.width - left - 64;
+    const isDark = document.documentElement.dataset.theme === "dark";
+    ctx.font = "12px Segoe UI, Arial";
+    data.forEach((d, i) => {
+      const y = top + i * rh;
+      ctx.fillStyle = isDark ? "#a8b3c7" : "#334155"; ctx.fillText(d[0], 12, y + 14);
+      ctx.fillStyle = isDark ? "#273142" : "#e2e8f0"; ctx.fillRect(left, y, barMax, 14);
+      ctx.fillStyle = d[2]; ctx.fillRect(left, y, (d[1] / max) * barMax, 14);
+      ctx.fillStyle = isDark ? "#e5eefb" : "#172033"; ctx.fillText(String(d[1]), left + barMax + 14, y + 12);
+    });
+  }
+
+  /* ── CLIPBOARD / DOWNLOAD ─────────────────────────────── */
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand("copy"); ta.remove();
+    }
+  }
+
+  function downloadFile(name, content, mime) {
+    const url = URL.createObjectURL(new Blob([content], { type: mime }));
+    const a = document.createElement("a"); a.href = url; a.download = name;
+    a.click(); URL.revokeObjectURL(url);
+    const ext = (name.split(".").pop() || "").toLowerCase();
+    T("export", { format: ext, mime, rowCount: state.results.length, name });
+  }
+
+  async function copyFormNumbers() {
+    const text = getFiltered().map(r => r.displayCode || r.normalizedCode).filter(Boolean).join("\n");
+    await copyText(text);
+    flashBtn("copyFormNumbersBtn", "✓ Copied!", "📋 Copy Numbers");
+  }
+
+  async function copyDescriptions() {
+    const text = getFiltered().map(r => {
+      const code = r.displayCode || r.normalizedCode;
+      return [code, r.description].filter(Boolean).join(" — ");
+    }).filter(Boolean).join("\n");
+    await copyText(text);
+    flashBtn("copyDescriptionsBtn", "✓ Copied!", "📋 Descriptions");
+  }
+
+  async function copyEntireTable() {
+    const rows = getFiltered();
+    const hdrs = ["Status","Code","Original Previous","Original Current","Description","Edition","Source"];
+    const body = rows.map(r => [r.status, r.displayCode||r.normalizedCode, r.originalPrevious, r.originalCurrent, r.description, r.edition, r.source||"Current Policy"]);
+    const tsv = [hdrs,...body].map(row => row.map(c => String(c||"").replace(/\t/g," ").replace(/\n/g," ")).join("\t")).join("\n");
+    await copyText(tsv);
+    flashBtn("copyTableBtn", "✓ Copied!", "📋 Copy Table");
+  }
+
+  async function copyChecklist() {
+    const src = el.resultViewSelect.value;
+    const rows = src === "all" ? state.checklistRows : state.checklistRows.filter(r => r.source === src);
+    const hdrs = ["Form / Description","Edition","Status","Compared Document"];
+    const body = rows.map(r => [r.formDescription, r.edition, r.status, r.source]);
+    const tsv = [hdrs,...body].map(row => row.map(c => String(c||"").replace(/\t/g," ").replace(/\n/g," ")).join("\t")).join("\n");
+    await copyText(tsv);
+    flashBtn("copyExcelBtn","Copied!","Copy for Excel");
+  }
+
+  function flashHeader(el, done, orig) {
+    el.textContent = done;
+    el.classList.add("header-copied");
+    window.setTimeout(() => {
+      el.textContent = orig;
+      el.classList.remove("header-copied");
+    }, 1200);
+  }
+
+  async function copyColumnCode() {
+    const rows = getFiltered();
+    const codes = rows.map(r => {
+      const edit = state.customEdits.get(r.normalizedCode) || {};
+      return edit.displayCode !== undefined ? edit.displayCode : (r.displayCode || r.normalizedCode);
+    }).filter(Boolean);
+    if (!codes.length) return;
+    await copyText(codes.join("\n"));
+    flashHeader(document.getElementById("hdrCopyCode"), "Copied! ✔", "Code 📋");
+  }
+
+  async function copyColumnDesc() {
+    const rows = getFiltered();
+    const descs = rows.map(r => {
+      const edit = state.customEdits.get(r.normalizedCode) || {};
+      return edit.description !== undefined ? edit.description : r.description;
+    }).filter(Boolean);
+    if (!descs.length) return;
+    await copyText(descs.join("\n"));
+    flashHeader(document.getElementById("hdrCopyDesc"), "Copied! ✔", "Description 📋");
+  }
+
+  async function copyColumnEdit() {
+    const rows = getFiltered();
+    const editions = rows.map(r => r.edition).filter(Boolean);
+    if (!editions.length) return;
+    await copyText(editions.join("\n"));
+    flashHeader(document.getElementById("hdrCopyEdit"), "Copied! ✔", "Edition 📋");
+  }
+
+  /* ── SBS COLUMN COPY ──────────────────────────────────── */
+  async function copySbsPrev() {
+    const rows = getFiltered();
+    const vals = rows.map(r => r.status === "Added" ? "" : (r.originalPrevious || r.displayCode || r.normalizedCode || "")).filter(Boolean);
+    if (!vals.length) return;
+    await copyText(vals.join("\n"));
+    flashHeader(document.getElementById("hdrSbsPrev"), "Copied! \u2714", "Previous Form \ud83d\udccb");
+  }
+
+  async function copySbsCurr() {
+    const rows = getFiltered();
+    const vals = rows.map(r => r.status === "Removed" ? "" : (r.originalCurrent || r.displayCode || r.normalizedCode || "")).filter(Boolean);
+    if (!vals.length) return;
+    await copyText(vals.join("\n"));
+    flashHeader(document.getElementById("hdrSbsCurr"), "Copied! \u2714", "Current Form \ud83d\udccb");
+  }
+
+  /* ── CHECKLIST TOGGLE STATE ───────────────────────────── */
+  let checklistView = "current";
+
+  function getChecklistRows() {
+    const src = el.resultViewSelect.value;
+    return src === "all" ? state.checklistRows : state.checklistRows.filter(r => r.source === src);
+  }
+
+  /* ── CHECKLIST COLUMN COPY ────────────────────────────── */
+  async function copyClForm() {
+    const vals = getChecklistRows().map(r => r.formDescription).filter(Boolean);
+    if (!vals.length) return;
+    await copyText(vals.join("\n"));
+    flashHeader(document.getElementById("hdrClForm"), "Copied! \u2714", "Form / Description \ud83d\udccb");
+  }
+
+  async function copyClEdition() {
+    const vals = getChecklistRows().map(r => r.edition).filter(Boolean);
+    if (!vals.length) return;
+    await copyText(vals.join("\n"));
+    flashHeader(document.getElementById("hdrClEdition"), "Copied! \u2714", "Edition \ud83d\udccb");
+  }
+
+  async function copyClStatus() {
+    const vals = getChecklistRows().map(r => r.status).filter(Boolean);
+    if (!vals.length) return;
+    await copyText(vals.join("\n"));
+    flashHeader(document.getElementById("hdrClStatus"), "Copied! \u2714", "Status \ud83d\udccb");
+  }
+
+  async function copyClSource() {
+    const vals = getChecklistRows().map(r => r.source).filter(Boolean);
+    if (!vals.length) return;
+    await copyText(vals.join("\n"));
+    flashHeader(document.getElementById("hdrClSource"), "Copied! \u2714", "Compared Document \ud83d\udccb");
+  }
+
+  /* ── CELL CLICK COPY ──────────────────────────────────── */
+  function flashCell(td, origText) {
+    td.classList.add("cell-flashed");
+    const saved = td.textContent;
+    td.textContent = "\u2714 Copied";
+    window.setTimeout(() => { td.textContent = origText; td.classList.remove("cell-flashed"); }, 900);
+  }
+
+  async function handleCellCopy(e) {
+    const td = e.target.closest("td.cell-copy");
+    if (!td) return;
+    const text = td.dataset.copyVal !== undefined ? td.dataset.copyVal : td.textContent.trim();
+    if (!text) return;
+    await copyText(text);
+    flashCell(td, td.textContent.trim());
+  }
+
+  /* ── CHECKLIST VIEW TOGGLE ────────────────────────────── */
+  function setChecklistView(view) {
+    checklistView = view;
+    document.getElementById("clToggleCurrent").classList.toggle("active", view === "current");
+    document.getElementById("clTogglePrevious").classList.toggle("active", view === "previous");
+    state.checklistRows = makeChecklistRows(state.results);
+    renderChecklist();
+  }
+
+  function toCsv(rows, opts = {}) {
+    const hdrs = ["Status","Code","Original Previous","Original Current"];
+    if (opts.desc !== false) hdrs.push("Description");
+    if (opts.source) hdrs.push("Source");
+    if (opts.notes) hdrs.push("User Note");
+    hdrs.push("Edition","System Note");
+    const body = rows.map(r => {
+      const cells = [r.status, r.displayCode||r.normalizedCode, r.originalPrevious, r.originalCurrent];
+      if (opts.desc !== false) cells.push(r.description);
+      if (opts.source) cells.push(r.source||"Current Policy");
+      if (opts.notes) cells.push(state.rowNotes.get(r.normalizedCode)||"");
+      cells.push(r.edition, r.notes);
+      return cells;
+    });
+    return [hdrs,...body].map(row => row.map(c => `"${String(c||"").replace(/"/g,'""')}"`).join(",")).join("\n");
+  }
+
+  function toExcelHtml(rows, opts = {}) {
+    const src = el.resultViewSelect.value;
+    const label = src === "all" ? "All compared documents" : displaySrcName(src);
+    const hdrs = ["Status","Code","Original Previous","Original Current"];
+    if (opts.desc !== false) hdrs.push("Description");
+    if (opts.source) hdrs.push("Source");
+    if (opts.notes) hdrs.push("User Note");
+    hdrs.push("Edition");
+    const body = rows.map(r => {
+      const cells = [r.status, r.displayCode||r.normalizedCode, r.originalPrevious, r.originalCurrent];
+      if (opts.desc !== false) cells.push(r.description);
+      if (opts.source) cells.push(r.source||"Current Policy");
+      if (opts.notes) cells.push(state.rowNotes.get(r.normalizedCode)||"");
+      cells.push(r.edition);
+      return cells;
+    });
+    const tbl = (h,b) => `<table border="1"><thead><tr>${h.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${b.map(row=>`<tr>${row.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    return `<!doctype html><html><head><meta charset="utf-8"></head><body><h1>${esc(label)}</h1>${tbl(hdrs,body)}</body></html>`;
+  }
+
+  /* ── SMART EXPORT ─────────────────────────────────────── */
+  function smartRows() {
+    let rows = baseRows();
+    if (document.getElementById("optDiffsOnly").checked || !document.getElementById("optMatches").checked) {
+      rows = rows.filter(r => r.status !== "Match");
+    }
+    return rows;
+  }
+
+  function smartOpts() {
+    return {
+      desc:   document.getElementById("optDescriptions").checked,
+      source: document.getElementById("optSource").checked,
+      notes:  document.getElementById("optUserNotes").checked,
+    };
+  }
+
+  async function smCopyExcel() {
+    const rows = smartRows(); const opts = smartOpts();
+    const hdrs = ["Status","Code"];
+    if (opts.desc) hdrs.push("Description");
+    if (opts.source) hdrs.push("Source");
+    if (opts.notes) hdrs.push("User Note");
+    hdrs.push("Edition");
+    const body = rows.map(r => {
+      const cells = [r.status, r.displayCode||r.normalizedCode];
+      if (opts.desc) cells.push(r.description);
+      if (opts.source) cells.push(r.source||"Current Policy");
+      if (opts.notes) cells.push(state.rowNotes.get(r.normalizedCode)||"");
+      cells.push(r.edition);
+      return cells;
+    });
+    const tsv = [hdrs,...body].map(row => row.map(c => String(c||"").replace(/\t/g," ").replace(/\n/g," ")).join("\t")).join("\n");
+    await copyText(tsv);
+    flashBtn("smCopyExcelBtn","✓ Copied!","📋 Copy for Excel");
+  }
+
+  async function smCopyNumbers() {
+    const text = smartRows().map(r => r.displayCode||r.normalizedCode).filter(Boolean).join("\n");
+    await copyText(text);
+    flashBtn("smCopyNumbersBtn","✓ Copied!","📋 Numbers Only");
+  }
+
+  /* ── DRAFT ────────────────────────────────────────────── */
+  function draftPayload() {
+    return {
+      savedAt: new Date().toISOString(),
+      previousInput: el.previousInput.value,
+      currentInput:  el.currentInput.value,
+      quoteInput:    el.quoteInput.value,
+      fourthInput:   el.fourthInput.value,
+      prefixes: el.prefixInput.value,
+      quoteVisible:  !document.getElementById("quotePane").classList.contains("hidden"),
+      fourthVisible: !document.getElementById("fourthPane").classList.contains("hidden"),
+      resultView: el.resultViewSelect.value,
+      rowNotes: Array.from(state.rowNotes.entries()),
+      customEdits: Array.from(state.customEdits.entries()),
+      pinnedCodes: Array.from(state.pinnedCodes),
+    };
+  }
+
+  function updateMemoryStatus(savedAt) {
+    if (el.memoryStatus) el.memoryStatus.textContent = savedAt ? `Saved locally ${new Date(savedAt).toLocaleString()}.` : "No saved draft yet.";
+  }
+
+  function saveDraft() {
+    try {
+      const p = draftPayload();
+      localStorage.setItem(draftKey, JSON.stringify(p));
+      updateMemoryStatus(p.savedAt);
+    } catch (e) {
+      if (el.memoryStatus) el.memoryStatus.textContent = "Draft memory unavailable in this browser.";
+    }
+  }
+
+  function scheduleDraftSave() {
+    window.clearTimeout(draftTimer);
+    draftTimer = window.setTimeout(saveDraft, 450);
+  }
+
+  function loadDraft() {
+    try {
+      const raw = localStorage.getItem(draftKey);
+      if (!raw) { updateMemoryStatus(null); return false; }
+      const d = JSON.parse(raw);
+      el.previousInput.value = d.previousInput || "";
+      el.currentInput.value  = d.currentInput  || "";
+      el.quoteInput.value    = d.quoteInput    || "";
+      el.fourthInput.value   = d.fourthInput   || "";
+      el.prefixInput.value   = d.prefixes || el.prefixInput.value;
+      if (d.quoteVisible  || d.quoteInput)  document.getElementById("quotePane").classList.remove("hidden");
+      if (d.fourthVisible || d.fourthInput) document.getElementById("fourthPane").classList.remove("hidden");
+      const opt = el.resultViewSelect.querySelector(`option[value="${d.resultView}"]`);
+      if (d.resultView && opt) el.resultViewSelect.value = d.resultView;
+      if (d.rowNotes)    state.rowNotes    = new Map(d.rowNotes);
+      if (d.customEdits) state.customEdits = new Map(d.customEdits);
+      if (d.pinnedCodes) state.pinnedCodes = new Set(d.pinnedCodes);
+      updateMemoryStatus(d.savedAt);
+      return true;
+    } catch (e) { updateMemoryStatus(null); return false; }
+  }
+
+  function clearSavedDraft() {
+    try { localStorage.removeItem(draftKey); } catch (e) { }
+    updateMemoryStatus(null);
+  }
+
+  /* ── UNDO ─────────────────────────────────────────────── */
+  function pushUndo() {
+    state.undoSnapshot = {
+      previousInput: el.previousInput.value,
+      currentInput:  el.currentInput.value,
+      quoteInput:    el.quoteInput.value,
+      fourthInput:   el.fourthInput.value,
+      results: [...state.results],
+      checklistRows: [...state.checklistRows],
+      previousItems: [...state.previousItems],
+      currentItems:  [...state.currentItems],
+    };
+  }
+
+  function showUndo() {
+    el.undoToast.classList.add("show");
+    window.setTimeout(() => el.undoToast.classList.remove("show"), 7000);
+  }
+
+  function undoClear() {
+    if (!state.undoSnapshot) return;
+    const s = state.undoSnapshot;
+    el.previousInput.value = s.previousInput;
+    el.currentInput.value  = s.currentInput;
+    el.quoteInput.value    = s.quoteInput;
+    el.fourthInput.value   = s.fourthInput;
+    state.results       = s.results;
+    state.checklistRows = s.checklistRows;
+    state.previousItems = s.previousItems;
+    state.currentItems  = s.currentItems;
+    state.undoSnapshot  = null;
+    renderPreview(el.previousPreview, state.previousItems);
+    renderPreview(el.currentPreview,  state.currentItems);
+    renderResults(); renderChecklist();
+    updateMetrics(summarize(state.results), null);
+    drawCharts(summarize(state.results));
+    updateFilterCounts();
+    el.undoToast.classList.remove("show");
+  }
+
+  /* ── CLEAR ALL ────────────────────────────────────────── */
+  function clearAll() {
+    pushUndo();
+    el.previousInput.value = ""; el.currentInput.value = ""; el.quoteInput.value = ""; el.fourthInput.value = "";
+    state.previousItems = []; state.currentItems = []; state.quoteItems = []; state.fourthItems = [];
+    state.results = []; state.checklistRows = [];
+    renderPreview(el.previousPreview, []); renderPreview(el.currentPreview, []);
+    renderPreview(el.quotePreview, []);    renderPreview(el.fourthPreview, []);
+    renderResults(); renderChecklist();
+    updateMetrics({}, null); updateFilterCounts(); drawCharts({});
+    el.lastCompared.textContent = "Not compared";
+    el.comparisonTime.textContent = "0.00 sec";
+    showUndo();
+  }
+
+  /* ── PLAY INLINE ──────────────────────────────────────── */
+  function togglePin(code) {
+    if (state.pinnedCodes.has(code)) state.pinnedCodes.delete(code);
+    else state.pinnedCodes.add(code);
+    renderResults(); scheduleDraftSave();
+  }
+
+  /* ── MANUAL RE-PAIR ───────────────────────────────────── */
+  // Two-click flow: click a row's link icon to arm it, then click another
+  // Added/Removed/Unknown row to merge them into one "Manually Linked" row.
+  // Exists because the automatic fuzzy matcher (compare.js Pass 3) is a greedy
+  // best-match, and can miss or mis-pair forms when several similar ones changed
+  // in the same batch — this is the reviewer's override for those cases.
+  function handleLinkClick(rowId) {
+    if (!state.linkPending) {
+      state.linkPending = rowId;
+      renderResults();
+      return;
+    }
+    if (state.linkPending === rowId) {
+      state.linkPending = null; // clicked the same row again: cancel
+      renderResults();
+      return;
+    }
+
+    const rowA = state.results.find(r => r._id === state.linkPending);
+    const rowB = state.results.find(r => r._id === rowId);
+    state.linkPending = null;
+
+    if (!rowA || !rowB) { renderResults(); return; }
+    if (rowA.status === rowB.status && rowA.status !== "Unknown Format") {
+      // Two Added rows or two Removed rows can't represent "the same form changing" —
+      // require at least one side to be Removed/Unknown and the other Added/Unknown.
+      alert("Link a \"Removed\" or \"Unknown\" row together with an \"Added\" or \"Unknown\" row — not two rows of the same status.");
+      renderResults();
+      return;
+    }
+
+    const merged = window.ComparatorEngine.linkManualPair(rowA, rowB);
+    merged._id = rowA._id;
+    T("manual_link", { statusA: rowA.status, statusB: rowB.status, codeA: rowA.normalizedCode, codeB: rowB.normalizedCode });
+    state.results = state.results.filter(r => r !== rowA && r !== rowB);
+    state.results.push(merged);
+    state.checklistRows = makeChecklistRows(state.results);
+    renderResults(); renderChecklist(); updateFilterCounts();
+    scheduleDraftSave();
+  }
+
+  /* ── NOTES ────────────────────────────────────────────── */
+  function openNote(code) {
+    noteTarget = code;
+    el.noteCodeBadge.textContent = code;
+    el.noteTextarea.value = state.rowNotes.get(code) || "";
+    el.noteDialog.showModal();
+    window.setTimeout(() => el.noteTextarea.focus(), 60);
+  }
+
+  function saveNote() {
+    if (!noteTarget) return;
+    const v = el.noteTextarea.value.trim();
+    if (v) { state.rowNotes.set(noteTarget, v); T("note_added", { code: noteTarget, length: v.length }); }
+    else   state.rowNotes.delete(noteTarget);
+    el.noteDialog.close(); noteTarget = null;
+    renderResults(); scheduleDraftSave();
+  }
+
+  /* ── EDITABLE CELLS ───────────────────────────────────── */
+  el.resultsBody.addEventListener("focus", e => {
+    const ce = e.target.closest("[contenteditable]");
+    if (!ce) return;
+    ce.textContent = ce.textContent;
+  }, true);
+
+  el.resultsBody.addEventListener("blur", e => {
+    const ce = e.target.closest("[contenteditable]");
+    if (!ce) return;
+    const code  = ce.dataset.code;
+    const field = ce.dataset.field;
+    if (!code || !field) return;
+    const value = ce.textContent.trim();
+    const orig  = state.results.find(r => r.normalizedCode === code);
+    const existing = state.customEdits.get(code) || {};
+    if (field === "displayCode") {
+      const origVal = orig ? (orig.displayCode || orig.normalizedCode) : "";
+      if (value !== origVal) existing.displayCode = value;
+      else delete existing.displayCode;
+    } else if (field === "description") {
+      const origVal = orig ? orig.description : "";
+      if (value !== origVal) existing.description = value;
+      else delete existing.description;
+    }
+    if (Object.keys(existing).length) state.customEdits.set(code, existing);
+    else state.customEdits.delete(code);
+    scheduleDraftSave();
+    if (field === "displayCode" || field === "description") T("manual_edit", { code, field, status: orig && orig.status });
+  }, true);
+
+  el.resultsBody.addEventListener("keydown", e => {
+    if (e.target.closest("[contenteditable]")) {
+      if (e.key === "Enter") { e.preventDefault(); e.target.blur(); }
+      if (e.key === "Escape") { e.target.blur(); }
+    }
+  });
+
+  /* ── FILTER CHIPS ─────────────────────────────────────── */
+  const chipMap = {
+    chipMatch: "Match",
+    chipAdded: "Added",
+    chipRemoved: "Removed",
+    chipChanged: "Edition Changed",
+    chipDescChanged: "Description Changed",
+    chipTypo: "Possible Typo",
+    chipUnknown: "Unknown Format"
+  };
+  for (const [id, status] of Object.entries(chipMap)) {
+    document.getElementById(id).addEventListener("click", () => {
+      state.filters[status] = !state.filters[status];
+      document.getElementById(id).classList.toggle("off", !state.filters[status]);
+      renderResults();
+    });
+  }
+
+  /* ── THEME ────────────────────────────────────────────── */
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    el.themeToggleBtn.textContent = theme === "dark" ? "Light Mode" : "Dark Mode";
+  }
+
+  function toggleTheme() {
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    applyTheme(next); drawCharts(summarize(state.results));
+    try { localStorage.setItem("formsComparatorTheme", next); } catch (e) { }
+    T("theme_toggle", { theme: next });
+  }
+
+  /* ── KEYBOARD SHORTCUTS ───────────────────────────────── */
+  document.addEventListener("keydown", e => {
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === "1") { e.preventDefault(); compare(); }
+      else if (e.key === "2") { e.preventDefault(); el.smartExportModal.showModal(); }
+      else if (e.key === "f" || e.key === "F") { e.preventDefault(); el.resultsSearch.focus(); el.resultsSearch.select(); }
+      else if ((e.key === "z" || e.key === "Z") && state.undoSnapshot) { e.preventDefault(); undoClear(); }
+    }
+  });
+
+  /* ── EVENT LISTENERS ──────────────────────────────────── */
+  document.getElementById("cleanPreviousBtn").addEventListener("click", cleanPrevious);
+  document.getElementById("cleanCurrentBtn").addEventListener("click", cleanCurrent);
+  document.getElementById("cleanQuoteBtn").addEventListener("click", cleanQuote);
+  document.getElementById("cleanFourthBtn").addEventListener("click", cleanFourth);
+  document.getElementById("compareBtn").addEventListener("click", compare);
+  document.getElementById("compareBtnWorkspace").addEventListener("click", compare);
+  document.getElementById("toggleSidebarBtn").addEventListener("click", () => {
+    document.querySelector(".app-shell").classList.toggle("sidebar-collapsed");
+  });
+  document.getElementById("hdrCopyCode").addEventListener("click", copyColumnCode);
+  document.getElementById("hdrCopyDesc").addEventListener("click", copyColumnDesc);
+  document.getElementById("hdrCopyEdit").addEventListener("click", copyColumnEdit);
+
+  document.getElementById("applySettingsBtn").addEventListener("click", () => {
+    state.prefixes = window.ComparatorParser.parsePrefixes(el.prefixInput.value);
+    cleanPrevious(); cleanCurrent(); cleanQuote(); cleanFourth();
+  });
+
+  document.getElementById("loadSamplesBtn").addEventListener("click", () => {
+    el.previousInput.value = samples.previous;
+    el.currentInput.value  = samples.current;
+    el.quoteInput.value    = samples.quote;
+    document.getElementById("quotePane").classList.remove("hidden");
+    compare();
+  });
+
+  document.getElementById("showQuoteBtn").addEventListener("click", () => {
+    document.getElementById("quotePane").classList.remove("hidden","collapsed-doc");
+    document.getElementById("collapseQuoteBtn").textContent = "Minimize";
+    el.quoteInput.focus(); scheduleDraftSave();
+  });
+
+  document.getElementById("showFourthBtn").addEventListener("click", () => {
+    document.getElementById("fourthPane").classList.remove("hidden","collapsed-doc");
+    document.getElementById("collapseFourthBtn").textContent = "Minimize";
+    el.fourthInput.focus(); scheduleDraftSave();
+  });
+
+  document.getElementById("collapseQuoteBtn").addEventListener("click", () => {
+    const p = document.getElementById("quotePane"); p.classList.toggle("collapsed-doc");
+    document.getElementById("collapseQuoteBtn").textContent = p.classList.contains("collapsed-doc") ? "Expand" : "Minimize";
+  });
+
+  document.getElementById("collapseFourthBtn").addEventListener("click", () => {
+    const p = document.getElementById("fourthPane"); p.classList.toggle("collapsed-doc");
+    document.getElementById("collapseFourthBtn").textContent = p.classList.contains("collapsed-doc") ? "Expand" : "Minimize";
+  });
+
+  document.getElementById("removeQuoteBtn").addEventListener("click", () => {
+    el.quoteInput.value = ""; state.quoteItems = [];
+    document.getElementById("quotePane").classList.add("hidden");
+    if (el.resultViewSelect.value === "Quote / 3rd Document") el.resultViewSelect.value = "all";
+    renderPreview(el.quotePreview, []); compare();
+  });
+
+  document.getElementById("removeFourthBtn").addEventListener("click", () => {
+    el.fourthInput.value = ""; state.fourthItems = [];
+    document.getElementById("fourthPane").classList.add("hidden");
+    if (el.resultViewSelect.value === "4th Document") el.resultViewSelect.value = "all";
+    renderPreview(el.fourthPreview, []); compare();
+  });
+
+  document.getElementById("resultViewSelect").addEventListener("change", () => {
+    renderResults(); renderChecklist(); updateFilterCounts();
+  });
+
+  // Results body delegation: group collapse, pin, note
+  el.resultsBody.addEventListener("click", e => {
+    const gb = e.target.closest("[data-group]");
+    if (gb) {
+      const src = gb.getAttribute("data-group");
+      if (state.collapsedGroups.has(src)) state.collapsedGroups.delete(src); else state.collapsedGroups.add(src);
+      renderResults(); return;
+    }
+    const lb = e.target.closest("[data-link]");
+    if (lb) { handleLinkClick(lb.getAttribute("data-link")); return; }
+    const pb = e.target.closest("[data-pin]");
+    if (pb) { togglePin(pb.getAttribute("data-pin")); return; }
+    const nb = e.target.closest("[data-note]");
+    if (nb) { openNote(nb.getAttribute("data-note")); return; }
+  });
+
+  // SBS body delegation
+  el.sbsBody.addEventListener("click", e => {
+    const pb = e.target.closest("[data-pin]");  if (pb) { togglePin(pb.getAttribute("data-pin")); return; }
+    const nb = e.target.closest("[data-note]"); if (nb) { openNote(nb.getAttribute("data-note")); return; }
+  });
+
+  // Search
+  el.resultsSearch.addEventListener("input", e => { state.searchQuery = e.target.value; renderResults(); });
+
+  // Diffs Only toggle
+  document.getElementById("diffsOnlyBtn").addEventListener("click", () => {
+    state.diffsOnly = !state.diffsOnly;
+    const btn = document.getElementById("diffsOnlyBtn");
+    btn.classList.toggle("toggle-on", state.diffsOnly);
+    btn.textContent = state.diffsOnly ? "✓ Diffs Only" : "Diffs Only";
+    renderResults();
+  });
+
+  // Side-by-Side toggle
+  document.getElementById("sideBySideBtn").addEventListener("click", () => {
+    state.sideBySide = !state.sideBySide;
+    const btn = document.getElementById("sideBySideBtn");
+    btn.classList.toggle("toggle-on", state.sideBySide);
+    btn.textContent = state.sideBySide ? "✓ Side by Side" : "Side by Side";
+    renderResults();
+  });
+
+  // Clear
+  document.getElementById("clearBtn").addEventListener("click", clearAll);
+  document.getElementById("clearBtnWorkspace").addEventListener("click", clearAll);
+
+  // Draft
+  document.getElementById("saveDraftBtn").addEventListener("click", saveDraft);
+  document.getElementById("clearDraftBtn").addEventListener("click", clearSavedDraft);
+
+  // Theme
+  document.getElementById("themeToggleBtn").addEventListener("click", toggleTheme);
+
+  // Export buttons
+  document.getElementById("exportCsvBtn").addEventListener("click", () => {
+    downloadFile("insurance-forms-comparison.csv", toCsv(baseRows()), "text/csv;charset=utf-8");
+  });
+  document.getElementById("exportExcelBtn").addEventListener("click", () => {
+    downloadFile("insurance-forms-comparison.xls", toExcelHtml(baseRows()), "application/vnd.ms-excel;charset=utf-8");
+  });
+  document.getElementById("exportJsonBtn").addEventListener("click", () => {
+    downloadFile("insurance-forms-comparison.json", JSON.stringify(baseRows(), null, 2), "application/json;charset=utf-8");
+  });
+
+  // New copy buttons
+  document.getElementById("copyFormNumbersBtn").addEventListener("click", copyFormNumbers);
+  document.getElementById("copyDescriptionsBtn").addEventListener("click", copyDescriptions);
+  document.getElementById("copyTableBtn").addEventListener("click", copyEntireTable);
+
+  // Smart Export modal
+  document.getElementById("smartExportBtn").addEventListener("click", () => el.smartExportModal.showModal());
+  document.getElementById("closeSmartExportBtn").addEventListener("click", () => el.smartExportModal.close());
+  document.getElementById("smCopyExcelBtn").addEventListener("click", smCopyExcel);
+  document.getElementById("smCopyNumbersBtn").addEventListener("click", smCopyNumbers);
+  document.getElementById("smDownloadCsvBtn").addEventListener("click", () => {
+    downloadFile("smart-export.csv", toCsv(smartRows(), smartOpts()), "text/csv;charset=utf-8");
+  });
+  document.getElementById("smDownloadExcelBtn").addEventListener("click", () => {
+    downloadFile("smart-export.xls", toExcelHtml(smartRows(), smartOpts()), "application/vnd.ms-excel;charset=utf-8");
+  });
+
+  // Note dialog
+  document.getElementById("saveNoteBtn").addEventListener("click", saveNote);
+  document.getElementById("clearNoteBtn").addEventListener("click", () => { el.noteTextarea.value = ""; });
+  document.getElementById("closeNoteBtn").addEventListener("click", () => { el.noteDialog.close(); noteTarget = null; });
+  el.noteTextarea.addEventListener("keydown", e => { if (e.key === "Enter" && e.ctrlKey) { e.preventDefault(); saveNote(); } });
+
+  // Undo
+  document.getElementById("undoBtn").addEventListener("click", undoClear);
+
+  // Checklist
+  document.getElementById("copyExcelBtn").addEventListener("click", copyChecklist);
+  document.getElementById("downloadTsvBtn").addEventListener("click", () => {
+    const src = el.resultViewSelect.value;
+    const rows = src === "all" ? state.checklistRows : state.checklistRows.filter(r => r.source === src);
+    const hdrs = ["Form / Description","Edition","Status","Compared Document"];
+    const body = rows.map(r => [r.formDescription,r.edition,r.status,r.source]);
+    const tsv = [hdrs,...body].map(row => row.map(c => String(c||"").replace(/\t/g," ").replace(/\n/g," ")).join("\t")).join("\n");
+    downloadFile("insurance-forms-checklist.tsv", tsv, "text/tab-separated-values;charset=utf-8");
+  });
+
+  // SBS column copy headers
+  document.getElementById("hdrSbsPrev").addEventListener("click", copySbsPrev);
+  document.getElementById("hdrSbsCurr").addEventListener("click", copySbsCurr);
+
+  // Checklist column copy headers
+  document.getElementById("hdrClForm").addEventListener("click", copyClForm);
+  document.getElementById("hdrClEdition").addEventListener("click", copyClEdition);
+  document.getElementById("hdrClStatus").addEventListener("click", copyClStatus);
+  document.getElementById("hdrClSource").addEventListener("click", copyClSource);
+
+  // Checklist Current / Previous toggle
+  document.getElementById("clToggleCurrent").addEventListener("click", () => setChecklistView("current"));
+  document.getElementById("clTogglePrevious").addEventListener("click", () => setChecklistView("previous"));
+
+  // Checklist cell-click copy (delegated)
+  el.excelChecklistBody.addEventListener("click", handleCellCopy);
+
+  // Maximize Full Screen toggle logic
+  function toggleMaximize(sectionId, btnId) {
+    const section = document.getElementById(sectionId);
+    const btn = document.getElementById(btnId);
+    const isMax = section.classList.toggle("maximized");
+    document.body.classList.toggle("section-maximized", isMax);
+    btn.textContent = isMax ? "✕ Minimize" : "⛶ Full Screen";
+    // Force browser window redraw to ensure sticky table headers align correctly
+    window.dispatchEvent(new Event("resize"));
+  }
+
+  document.getElementById("maximizeResultsBtn").addEventListener("click", () => {
+    toggleMaximize("results", "maximizeResultsBtn");
+  });
+
+  document.getElementById("maximizeChecklistBtn").addEventListener("click", () => {
+    toggleMaximize("excelChecklist", "maximizeChecklistBtn");
+  });
+
+  // ESC key to exit full screen
+  window.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+      const maxed = document.querySelector(".results-section.maximized");
+      if (maxed) {
+        maxed.classList.remove("maximized");
+        document.body.classList.remove("section-maximized");
+        const btnR = document.getElementById("maximizeResultsBtn");
+        if (btnR) btnR.textContent = "⛶ Full Screen";
+        const btnC = document.getElementById("maximizeChecklistBtn");
+        if (btnC) btnC.textContent = "⛶ Full Screen";
+        window.dispatchEvent(new Event("resize"));
+      }
+    }
+  });
+
+
+
+  // Dialog click-outside-to-close
+  [el.smartExportModal, el.noteDialog].forEach(dlg => {
+    dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+  });
+
+  // Service Worker (optional, only in live hosted version)
+  if ("serviceWorker" in navigator && !document.documentElement.dataset.offlineCopy) {
+    navigator.serviceWorker.register("./service-worker.js").then(reg => {
+      reg.update();
+      if (el.offlineStatus) el.offlineStatus.textContent = "Offline cache is active. The standalone download is also available.";
+    }).catch(() => {
+      if (el.offlineStatus) el.offlineStatus.textContent = "Standalone offline download is available.";
+    });
+  }
+
+  // Input auto-save draft & auto-compare (600ms debounce)
+  let autoCompareTimer = null;
+  [el.previousInput, el.currentInput, el.quoteInput, el.fourthInput, el.prefixInput].forEach(f => {
+    f.addEventListener("input", () => {
+      scheduleDraftSave();
+      window.clearTimeout(autoCompareTimer);
+      autoCompareTimer = window.setTimeout(compare, 600);
+    });
+  });
+  window.addEventListener("beforeunload", saveDraft);
+
+  /* ── INIT ─────────────────────────────────────────────── */
+  try { applyTheme(localStorage.getItem("formsComparatorTheme") || "light"); }
+  catch (e) { applyTheme("light"); }
+
+  const hadDraft = loadDraft();
+
+  renderPreview(el.previousPreview, []);
+  renderPreview(el.currentPreview,  []);
+  renderPreview(el.quotePreview,    []);
+  renderPreview(el.fourthPreview,   []);
+  renderResults(); renderChecklist();
+  updateMetrics({}, null); updateFilterCounts(); drawCharts({});
+
+  if (hadDraft && (el.previousInput.value || el.currentInput.value || el.quoteInput.value || el.fourthInput.value)) {
+    compare();
+  }
+})();
+
+</script>
+  </body>
+</html>

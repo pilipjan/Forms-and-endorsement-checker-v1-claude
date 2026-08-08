@@ -1,0 +1,14 @@
+{
+  "name": "forms-comparator-analytics-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal-use event receiver for the Insurance Forms Comparator analytics build.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "report": "node summarize.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

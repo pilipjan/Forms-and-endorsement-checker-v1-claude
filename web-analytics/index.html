@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Insurance Forms Comparator (Analytics Build — Personal Use)</title>
+    <meta
+      name="description"
+      content="Offline-capable browser comparator for insurance forms and endorsements schedules. v2.0"
+    />
+    <meta name="theme-color" content="#111827" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <!-- ===== SIDEBAR ===== -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">IF</div>
+          <div>
+            <h1>Insurance Forms Comparator <span style="font-size:12px;font-weight:600;color:#0891b2;border:1px solid #0891b2;border-radius:999px;padding:2px 8px;vertical-align:middle;">analytics build — usage data sent to your server</span></h1>
+            <p>Forms &amp; Endorsements schedules</p>
+          </div>
+        </div>
+
+        <nav class="nav-list" aria-label="Workspace sections">
+          <a href="#workspace">Workspace</a>
+          <a href="#results">Results</a>
+          <a href="#settings">Settings</a>
+        </nav>
+
+        <section class="side-panel">
+          <h2>Workflow</h2>
+          <ol>
+            <li>Paste Previous and Current schedules.</li>
+            <li>Clean &amp; Preview both sides.</li>
+            <li>Fix OCR issues in the raw input.</li>
+            <li>Compare, then copy the Excel checklist.</li>
+          </ol>
+        </section>
+
+        <section class="side-panel compact">
+          <h2>Keyboard Shortcuts</h2>
+          <div class="shortcuts-list">
+            <div class="shortcut-row"><span>Compare</span><span><kbd class="kbd">Ctrl</kbd> <kbd class="kbd">1</kbd></span></div>
+            <div class="shortcut-row"><span>Smart Export</span><span><kbd class="kbd">Ctrl</kbd> <kbd class="kbd">2</kbd></span></div>
+            <div class="shortcut-row"><span>Search</span><span><kbd class="kbd">Ctrl</kbd> <kbd class="kbd">F</kbd></span></div>
+            <div class="shortcut-row"><span>Undo Clear</span><span><kbd class="kbd">Ctrl</kbd> <kbd class="kbd">Z</kbd></span></div>
+          </div>
+        </section>
+
+        <section class="side-panel compact">
+          <h2>Privacy</h2>
+          <p>No pasted policy data is uploaded or sent anywhere. Draft restore saves only in this browser.</p>
+        </section>
+
+        <section class="side-panel compact">
+          <h2>Version</h2>
+          <p>Offline-capable web app 2.0.0</p>
+        </section>
+      </aside>
+
+      <!-- ===== MAIN ===== -->
+      <main class="main">
+        <header class="topbar">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="btn secondary" id="toggleSidebarBtn" type="button" title="Toggle Sidebar" style="padding: 10px 12px; min-width: 42px;">☰</button>
+            <div>
+              <p class="eyebrow">Commercial policy processing</p>
+              <h2>Compare Previous vs Current policy forms</h2>
+            </div>
+          </div>
+          <div class="toolbar">
+            <button class="btn secondary" id="loadSamplesBtn" type="button">Load Sample</button>
+            <button class="btn secondary" id="showQuoteBtn" type="button">Add 3rd Document</button>
+            <button class="btn secondary" id="showFourthBtn" type="button">Add 4th Document</button>
+            <button class="btn secondary" id="themeToggleBtn" type="button">Dark Mode</button>
+            <button class="btn secondary" id="clearBtn" type="button">Clear</button>
+            <a class="btn secondary" id="downloadOfflineLink" href="./insurance-forms-comparator-offline.html" download>
+              Download Offline Copy
+            </a>
+            <button class="btn primary" id="compareBtn" type="button">⚡ Compare Policies</button>
+          </div>
+        </header>
+
+        <section class="privacy-banner" aria-label="Privacy and offline notice">
+          <strong>Privacy notice:</strong>
+          This tool runs entirely in your browser. Pasted policy data is not uploaded, tracked, or sent to a server.
+          Draft restore saves locally on this device only.
+          <span id="offlineStatus">Offline copy ready after first load.</span>
+        </section>
+
+        <section class="memory-banner" aria-label="Local draft restore">
+          <div>
+            <strong>Local draft restore</strong>
+            <span id="memoryStatus">No saved draft yet.</span>
+          </div>
+          <div>
+            <button class="btn secondary small" id="clearDraftBtn" type="button">Delete Save</button>
+            <button class="btn primary small" id="saveDraftBtn" type="button">Save Draft</button>
+            <button class="btn small danger" id="undoBtn" type="button" title="Recover cleared tables (Ctrl+Z)" style="display:none;">Undo Clear</button>
+          </div>
+        </section>
+
+        <!-- ===== METRICS ===== -->
+        <section class="metrics" aria-label="Comparison summary">
+          <div class="metric"><span>Previous</span><strong id="metricPrevious">0</strong></div>
+          <div class="metric"><span>Current</span><strong id="metricCurrent">0</strong></div>
+          <div class="metric good"><span>Matches</span><strong id="metricMatch">0</strong></div>
+          <div class="metric added"><span>Added</span><strong id="metricAdded">0</strong></div>
+          <div class="metric removed"><span>Removed</span><strong id="metricRemoved">0</strong></div>
+          <div class="metric changed"><span>Edition Changed</span><strong id="metricChanged">0</strong></div>
+          <div class="metric desc-changed"><span>Desc Changed</span><strong id="metricDescChanged">0</strong></div>
+          <div class="metric typo"><span>Possible Typo</span><strong id="metricTypo">0</strong></div>
+          <div class="metric unknown"><span>Unknown</span><strong id="metricUnknown">0</strong></div>
+          <div class="metric"><span>Completion</span><strong id="metricCompletion">0%</strong></div>
+        </section>
+
+        <!-- ===== HTML CHARTS ===== -->
+        <!-- Charts side-by-side -->
+        <section class="dashboard-grid">
+          <div class="chart-panel">
+            <div class="section-head">
+              <h3>Outcome Mix</h3>
+              <span>Percentage</span>
+            </div>
+            <canvas id="pieChart" width="340" height="220" aria-label="Status distribution chart"></canvas>
+          </div>
+          <div class="chart-panel">
+            <div class="section-head">
+              <h3>Status Counts</h3>
+              <span>Forms count</span>
+            </div>
+            <canvas id="barChart" width="560" height="220" aria-label="Status count chart"></canvas>
+          </div>
+        </section>
+
+        <!-- ===== WORKSPACE ===== -->
+        <section class="workspace" id="workspace">
+          <article class="policy-pane">
+            <div class="section-head">
+              <h3>Previous Policy</h3>
+              <button class="btn small" id="cleanPreviousBtn" type="button">Clean &amp; Preview</button>
+            </div>
+            <textarea id="previousInput" spellcheck="false" placeholder="Paste previous policy forms here"></textarea>
+            <div class="preview-table-wrap">
+              <table><thead><tr><th>Status</th><th>Code</th><th>Edition</th><th>Description</th></tr></thead>
+              <tbody id="previousPreview"></tbody></table>
+            </div>
+          </article>
+
+          <article class="policy-pane">
+            <div class="section-head">
+              <h3>Current Policy</h3>
+              <button class="btn small" id="cleanCurrentBtn" type="button">Clean &amp; Preview</button>
+            </div>
+            <textarea id="currentInput" spellcheck="false" placeholder="Paste current policy forms here"></textarea>
+            <div class="preview-table-wrap">
+              <table><thead><tr><th>Status</th><th>Code</th><th>Edition</th><th>Description</th></tr></thead>
+              <tbody id="currentPreview"></tbody></table>
+            </div>
+          </article>
+
+          <article class="policy-pane optional-doc hidden" id="quotePane">
+            <div class="section-head">
+              <h3>Quote / 3rd Document</h3>
+              <div class="toolbar">
+                <button class="btn small" id="collapseQuoteBtn" type="button">Minimize</button>
+                <button class="btn small danger" id="removeQuoteBtn" type="button">Remove</button>
+                <button class="btn small" id="cleanQuoteBtn" type="button">Clean &amp; Preview</button>
+              </div>
+            </div>
+            <textarea id="quoteInput" spellcheck="false" placeholder="Paste quote or third schedule here"></textarea>
+            <div class="preview-table-wrap">
+              <table><thead><tr><th>Status</th><th>Code</th><th>Edition</th><th>Description</th></tr></thead>
+              <tbody id="quotePreview"></tbody></table>
+            </div>
+          </article>
+
+          <article class="policy-pane optional-doc hidden" id="fourthPane">
+            <div class="section-head">
+              <h3>4th Document</h3>
+              <div class="toolbar">
+                <button class="btn small" id="collapseFourthBtn" type="button">Minimize</button>
+                <button class="btn small danger" id="removeFourthBtn" type="button">Remove</button>
+                <button class="btn small" id="cleanFourthBtn" type="button">Clean &amp; Preview</button>
+              </div>
+            </div>
+            <textarea id="fourthInput" spellcheck="false" placeholder="Paste fourth schedule here"></textarea>
+            <div class="preview-table-wrap">
+              <table><thead><tr><th>Status</th><th>Code</th><th>Edition</th><th>Description</th></tr></thead>
+              <tbody id="fourthPreview"></tbody></table>
+            </div>
+          </article>
+        </section>
+
+        <!-- ===== COMPARE ACTION BAR ===== -->
+        <div class="compare-action-bar">
+          <button class="btn primary large-compare-btn" id="compareBtnWorkspace" type="button">⚡ Compare Policies</button>
+          <button class="btn secondary large-clear-btn" id="clearBtnWorkspace" type="button">🗑 Clear All</button>
+        </div>
+
+        <!-- ===== RESULTS SECTION ===== -->
+        <section class="results-section" id="results">
+          <!-- Head row: title + copy/export buttons -->
+          <div class="results-section-head">
+            <h3>Comparison Results</h3>
+            <div class="results-copy-group">
+              <label class="select-label" for="resultViewSelect">View</label>
+              <select id="resultViewSelect">
+                <option value="all">All compared documents</option>
+                <option value="Current Policy">Current Policy</option>
+                <option value="Quote / 3rd Document">3rd Document</option>
+                <option value="4th Document">4th Document</option>
+              </select>
+              <button class="btn secondary small" id="copyFormNumbersBtn" type="button">📋 Copy Numbers</button>
+              <button class="btn secondary small" id="copyDescriptionsBtn" type="button">📋 Descriptions</button>
+              <button class="btn secondary small" id="copyTableBtn" type="button">📋 Copy Table</button>
+              <button class="btn secondary small" id="exportCsvBtn" type="button">⬇ CSV</button>
+              <button class="btn secondary small" id="exportExcelBtn" type="button">⬇ Excel</button>
+              <button class="btn secondary small" id="exportJsonBtn" type="button">⬇ JSON</button>
+              <button class="btn primary small" id="smartExportBtn" type="button">✨ Smart Export</button>
+              <button class="btn secondary small" id="maximizeResultsBtn" type="button" style="font-weight:700; border-color:var(--accent);">⛶ Full Screen</button>
+            </div>
+          </div>
+
+          <p class="section-note" id="exportScopeNote" style="padding:4px 16px 0;">Exports use the selected view.</p>
+
+          <!-- V2.0 Filter Bar -->
+          <div class="filter-bar" id="filterBar">
+            <div class="filter-chips">
+              <button class="chip chip-match"   id="chipMatch"   type="button"><span class="chip-dot"></span> Match <span id="cntMatch">(0)</span></button>
+              <button class="chip chip-added"   id="chipAdded"   type="button"><span class="chip-dot"></span> Added <span id="cntAdded">(0)</span></button>
+              <button class="chip chip-removed" id="chipRemoved" type="button"><span class="chip-dot"></span> Removed <span id="cntRemoved">(0)</span></button>
+              <button class="chip chip-changed" id="chipChanged" type="button"><span class="chip-dot"></span> Changed <span id="cntChanged">(0)</span></button>
+              <button class="chip chip-desc-changed" id="chipDescChanged" type="button"><span class="chip-dot"></span> Desc Changed <span id="cntDescChanged">(0)</span></button>
+              <button class="chip chip-typo" id="chipTypo" type="button"><span class="chip-dot"></span> Possible Typo <span id="cntTypo">(0)</span></button>
+              <button class="chip chip-unknown" id="chipUnknown" type="button"><span class="chip-dot"></span> Unknown <span id="cntUnknown">(0)</span></button>
+            </div>
+            <div class="filter-search-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="search" id="resultsSearch" placeholder="Search forms... (Ctrl+F)" autocomplete="off">
+            </div>
+            <div class="filter-actions">
+              <button class="btn small" id="diffsOnlyBtn" type="button">Diffs Only</button>
+              <button class="btn small" id="sideBySideBtn" type="button">Side by Side</button>
+            </div>
+          </div>
+
+          <!-- Regular results table -->
+          <div class="results-table-wrap" id="resultsTableWrap" style="margin:0 16px 16px;">
+            <table class="result-table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Document</th>
+                  <th class="copyable-header" id="hdrCopyCode" title="Click to copy Code column">Code 📋</th>
+                  <th>Original Previous</th>
+                  <th>Original Current</th>
+                  <th class="copyable-header" id="hdrCopyDesc" title="Click to copy Description column">Description 📋</th>
+                  <th class="copyable-header" id="hdrCopyEdit" title="Click to copy Edition column">Edition 📋</th>
+                  <th>System Note</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="resultsBody"></tbody>
+            </table>
+          </div>
+
+          <!-- Side-by-side table (hidden by default) -->
+          <div class="results-table-wrap hidden" id="sbsWrap" style="margin:0 16px 16px;">
+            <table class="sbs-table">
+              <thead>
+                <tr>
+                  <th style="width:90px;">Status</th>
+                  <th class="copyable-header" id="hdrSbsPrev" title="Click to copy Previous Form column">Previous Form 📋</th>
+                  <th class="copyable-header" id="hdrSbsCurr" title="Click to copy Current Form column">Current Form 📋</th>
+                  <th style="width:70px;text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="sbsBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ===== EXCEL CHECKLIST ===== -->
+        <section class="results-section" id="excelChecklist">
+          <div class="section-head" style="padding:12px 16px;border-bottom:1px solid var(--line);">
+            <div>
+              <h3>Excel Paste Checklist</h3>
+              <p class="section-note">Click any column header to copy that column. Click a row cell to copy that cell.</p>
+            </div>
+            <div class="toolbar" style="gap:8px;align-items:center;">
+              <span style="font-size:12px;color:var(--muted);white-space:nowrap;">Show form from:</span>
+              <div class="toggle-group" id="checklistViewToggle">
+                <button class="toggle-btn active" id="clToggleCurrent" type="button" data-view="current">Current</button>
+                <button class="toggle-btn" id="clTogglePrevious" type="button" data-view="previous">Previous</button>
+              </div>
+              <button class="btn secondary" id="copyExcelBtn" type="button">Copy for Excel</button>
+              <button class="btn secondary" id="downloadTsvBtn" type="button">Download TSV</button>
+              <button class="btn secondary" id="maximizeChecklistBtn" type="button" style="font-weight:700; border-color:var(--accent);">⛶ Full Screen</button>
+            </div>
+          </div>
+          <div class="results-table-wrap" style="margin:12px 16px 16px;">
+            <table>
+              <thead><tr>
+                <th class="copyable-header" id="hdrClForm" title="Click to copy Form/Description column">Form / Description 📋</th>
+                <th class="copyable-header" id="hdrClEdition" title="Click to copy Edition column">Edition 📋</th>
+                <th class="copyable-header" id="hdrClStatus" title="Click to copy Status column">Status 📋</th>
+                <th class="copyable-header" id="hdrClSource" title="Click to copy Compared Document column">Compared Document 📋</th>
+              </tr></thead>
+              <tbody id="excelChecklistBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ===== SETTINGS ===== -->
+        <section class="settings-section" id="settings">
+          <div class="section-head">
+            <h3>Settings</h3>
+            <button class="btn small" id="applySettingsBtn" type="button">Apply Prefixes</button>
+          </div>
+          <label for="prefixInput">Known prefixes</label>
+          <input id="prefixInput" type="text" value="AG, AP, ASPCO, B, BCG, BCR, BCP, BDEC, BEONY, BIL, BM, BP, CA, CF, CG, CL, CM, CP, CR, CU, CX, CY, DE, DL, DP, DS, EB, EP, FB, FL, FO, FP, GI, HO, IH, IL, IM, IN, MC, MI, MM, MP, OP, PM, PP, PR, SE, SF, TC, WC" />
+        </section>
+      </main>
+    </div>
+
+    <!-- ===== SMART EXPORT MODAL ===== -->
+    <dialog id="smartExportModal" class="smart-export-modal">
+      <div class="modal-header">
+        <h3>✨ Smart Export</h3>
+        <button class="modal-close-btn" id="closeSmartExportBtn" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="export-opts-grid">
+          <label class="export-opt-lbl"><input type="checkbox" id="optDescriptions" checked> Include Descriptions</label>
+          <label class="export-opt-lbl"><input type="checkbox" id="optMatches" checked> Include Matches</label>
+          <label class="export-opt-lbl"><input type="checkbox" id="optStatus" checked> Include Status</label>
+          <label class="export-opt-lbl"><input type="checkbox" id="optUserNotes"> Include User Notes</label>
+          <label class="export-opt-lbl"><input type="checkbox" id="optDiffsOnly"> Differences Only</label>
+          <label class="export-opt-lbl"><input type="checkbox" id="optSource"> Include Source Doc</label>
+        </div>
+        <div class="modal-footer">
+          <button class="btn primary" id="smCopyExcelBtn" type="button">📋 Copy for Excel</button>
+          <button class="btn secondary" id="smCopyNumbersBtn" type="button">📋 Numbers Only</button>
+          <button class="btn secondary" id="smDownloadCsvBtn" type="button">⬇ CSV</button>
+          <button class="btn secondary" id="smDownloadExcelBtn" type="button">⬇ Excel</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- ===== NOTE DIALOG ===== -->
+    <dialog id="noteDialog" class="note-dialog">
+      <div class="note-dialog-hdr">
+        <span>📝 Note — <span id="noteCodeBadge" class="note-code-badge"></span></span>
+        <button class="modal-close-btn" id="closeNoteBtn" type="button">✕</button>
+      </div>
+      <textarea id="noteTextarea" placeholder="Type your note here… (Ctrl+Enter to save)"></textarea>
+      <div class="note-dialog-ftr">
+        <button class="btn secondary small" id="clearNoteBtn" type="button">Clear</button>
+        <button class="btn primary small" id="saveNoteBtn" type="button">Save Note</button>
+      </div>
+    </dialog>
+
+    <!-- ===== UNDO TOAST ===== -->
+    <div class="undo-toast" id="undoToast" role="status" aria-live="polite">
+      <span>Data cleared.</span>
+      <button id="undoBtn" type="button">↩ Undo</button>
+    </div>
+
+    <script src="./analytics.js"></script>
+    <script src="./parser.js"></script>
+    <script src="./compare.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
