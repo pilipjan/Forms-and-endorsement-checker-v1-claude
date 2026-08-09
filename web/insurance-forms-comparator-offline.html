@@ -100,18 +100,31 @@ button, input, textarea { font: inherit; }
 
 /* ===== DARK MODE SIDEBAR ===== */
 :root[data-theme="dark"] .sidebar { background: linear-gradient(180deg, #123b74 0%, #0b2c59 55%, #081f3d 100%); }
+:root[data-theme="brand"] .sidebar { background: linear-gradient(180deg, #123b74 0%, #0b2c59 55%, #081f3d 100%); }
 :root[data-theme="dark"] .brand-mark { background: #eaf4ff; color: #0f5fb9; }
+:root[data-theme="brand"] .brand-mark { background: #eaf4ff; color: #0f5fb9; }
 :root[data-theme="dark"] .nav-list a { background: rgba(255,255,255,0.1); }
+:root[data-theme="brand"] .nav-list a { background: rgba(255,255,255,0.1); }
 :root[data-theme="dark"] .privacy-banner { background: #102647; border-color: #1e5da8; color: #dbeafe; }
+:root[data-theme="brand"] .privacy-banner { background: #102647; border-color: #1e5da8; color: #dbeafe; }
 :root[data-theme="dark"] .privacy-banner strong, :root[data-theme="dark"] .privacy-banner span { color: #e5eefb; }
+:root[data-theme="brand"] .privacy-banner strong, :root[data-theme="brand"] .privacy-banner span { color: #e5eefb; }
 :root[data-theme="dark"] .memory-banner { background: #111827; border-color: #26364f; }
+:root[data-theme="brand"] .memory-banner { background: #111827; border-color: #26364f; }
 :root[data-theme="dark"] textarea,
+:root[data-theme="brand"] textarea,
 :root[data-theme="dark"] input:not([type="checkbox"]),
+:root[data-theme="brand"] input:not([type="checkbox"]),
 :root[data-theme="dark"] select,
+:root[data-theme="brand"] select,
 :root[data-theme="dark"] .btn.secondary { background: #0f172a; border-color: #2c3f5f; color: #e5eefb; }
+:root[data-theme="brand"] .btn.secondary { background: #0f172a; border-color: #2c3f5f; color: #e5eefb; }
 :root[data-theme="dark"] th { background: #1f2d44; color: #e5eefb; }
+:root[data-theme="brand"] th { background: #1f2d44; color: #e5eefb; }
 :root[data-theme="dark"] .result-table th:nth-child(-n+3) { background: #1d4ed8; }
+:root[data-theme="brand"] .result-table th:nth-child(-n+3) { background: #1d4ed8; }
 :root[data-theme="dark"] dialog { background: var(--panel); color: var(--ink); border-color: var(--line); }
+:root[data-theme="brand"] dialog { background: var(--panel); color: var(--ink); border-color: var(--line); }
 
 /* ===== LAYOUT ===== */
 .app-shell {
@@ -180,6 +193,8 @@ button, input, textarea { font: inherit; }
 .btn.secondary { background: #f8fafc; }
 .btn.small { padding: 6px 10px; font-size: 12px; }
 .btn.danger { color: var(--red); border-color: #fecaca; background: #fff7f7; }
+:root[data-theme="dark"] .btn.danger,
+:root[data-theme="brand"] .btn.danger { background: #2e1212; border-color: #5b1f1f; }
 .btn.toggle-on { background: var(--accent) !important; color: #fff !important; border-color: var(--accent-dark) !important; }
 .select-label { align-self: center; color: var(--muted); font-size: 13px; font-weight: 700; }
 select { min-height: 38px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); padding: 0 10px; font: inherit; }
@@ -203,8 +218,10 @@ select { min-height: 38px; border: 1px solid var(--line); border-radius: 8px; ba
 .metric.changed strong { color: var(--orange); }
 .metric.desc-changed strong { color: #8b5cf6; }
 :root[data-theme="dark"] .metric.desc-changed strong { color: #a78bfa; }
+:root[data-theme="brand"] .metric.desc-changed strong { color: #a78bfa; }
 .metric.typo strong { color: #d946ef; }
 :root[data-theme="dark"] .metric.typo strong { color: #f472b6; }
+:root[data-theme="brand"] .metric.typo strong { color: #f472b6; }
 .metric.unknown strong { color: #475569; }
 
 /* ===== GRIDS ===== */
@@ -280,15 +297,25 @@ tr.status-description-changed td:nth-child(6):hover { opacity: 1; font-style: no
 
 /* Dark mode subtle tints */
 :root[data-theme="dark"] tr.status-match           { background: rgba(74,222,128,0.06); }
+:root[data-theme="brand"] tr.status-match           { background: rgba(74,222,128,0.06); }
 :root[data-theme="dark"] tr.status-added           { background: rgba(251,191,36,0.08); }
+:root[data-theme="brand"] tr.status-added           { background: rgba(251,191,36,0.08); }
 :root[data-theme="dark"] tr.status-removed         { background: rgba(248,113,113,0.08); }
+:root[data-theme="brand"] tr.status-removed         { background: rgba(248,113,113,0.08); }
 :root[data-theme="dark"] tr.status-edition-changed,
+:root[data-theme="brand"] tr.status-edition-changed,
 :root[data-theme="dark"] tr.status-revised         { background: rgba(251,146,60,0.08); }
+:root[data-theme="brand"] tr.status-revised         { background: rgba(251,146,60,0.08); }
 :root[data-theme="dark"] tr.status-description-changed { background: rgba(167,139,250,0.08); }
+:root[data-theme="brand"] tr.status-description-changed { background: rgba(167,139,250,0.08); }
 :root[data-theme="dark"] tr.status-possible-typo     { background: rgba(244,114,182,0.08); }
+:root[data-theme="brand"] tr.status-possible-typo     { background: rgba(244,114,182,0.08); }
 :root[data-theme="dark"] tr.status-unknown-format,
+:root[data-theme="brand"] tr.status-unknown-format,
 :root[data-theme="dark"] tr.status-unknown         { background: rgba(148,163,184,0.08); }
+:root[data-theme="brand"] tr.status-unknown         { background: rgba(148,163,184,0.08); }
 :root[data-theme="dark"] tr.status-manually-linked { background: rgba(34,211,238,0.08); }
+:root[data-theme="brand"] tr.status-manually-linked { background: rgba(34,211,238,0.08); }
 
 /* Pinned rows */
 tr.row-pinned { outline: 1px dashed var(--accent); outline-offset: -1px; }
@@ -313,6 +340,7 @@ tr.row-pinned { outline: 1px dashed var(--accent); outline-offset: -1px; }
 .chip-desc-changed .chip-dot { background: var(--s-desc-changed); }
 .chip-typo .chip-dot { background: var(--s-typo); }
 .chip-unknown .chip-dot { background: var(--s-unknown); }
+.chip-manual .chip-dot { background: var(--s-manual); }
 .filter-search-wrap { flex: 1; min-width: 140px; position: relative; }
 .filter-search-wrap input[type="search"] { width: 100%; padding: 6px 12px 6px 30px; border: 1.5px solid var(--line); border-radius: 20px; background: var(--panel); color: var(--ink); font-size: 13px; outline: none; transition: border-color 0.15s; }
 .filter-search-wrap input[type="search"]:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(40,126,228,0.15); }
@@ -324,6 +352,8 @@ tr.row-pinned { outline: 1px dashed var(--accent); outline-offset: -1px; }
 .pin-btn:hover  { transform: scale(1.2); }
 .note-btn:hover { transform: scale(1.15); color: var(--blue); }
 .link-btn:hover { transform: scale(1.15); color: var(--s-manual); }
+.db-add-btn { background: none; border: none; cursor: pointer; font-size: 13px; padding: 1px 3px; transition: transform 0.12s; }
+.db-add-btn:hover { transform: scale(1.2); }
 .pin-btn.on   { color: #f59e0b; }
 .note-btn.on  { color: var(--accent); }
 .link-btn.on  { color: var(--s-manual); animation: link-pulse 1s ease-in-out infinite; }
@@ -337,7 +367,9 @@ tr.row-pinned { outline: 1px dashed var(--accent); outline-offset: -1px; }
 .dup-badge  { background: rgba(220,38,38,0.12); color: var(--s-removed); }
 .conf-badge { background: rgba(148,163,184,0.18); color: var(--muted); }
 :root[data-theme="dark"] .dup-badge  { background: rgba(248,113,113,0.18); }
+:root[data-theme="brand"] .dup-badge  { background: rgba(248,113,113,0.18); }
 :root[data-theme="dark"] .conf-badge { background: rgba(148,163,184,0.22); }
+:root[data-theme="brand"] .conf-badge { background: rgba(148,163,184,0.22); }
 
 /* ===== EDITABLE CELLS ===== */
 [contenteditable] { border-radius: 3px; padding: 1px 3px; margin: -1px -3px; outline: none; }
@@ -346,18 +378,19 @@ tr.row-pinned { outline: 1px dashed var(--accent); outline-offset: -1px; }
 /* ===== SEARCH HIGHLIGHT ===== */
 mark.hl { background: #fef08a; color: #1e293b; border-radius: 2px; padding: 0 1px; }
 :root[data-theme="dark"] mark.hl { background: #713f12; color: #fef3c7; }
+:root[data-theme="brand"] mark.hl { background: #713f12; color: #fef3c7; }
 
 /* ===== INLINE DIFF HIGHLIGHTING ===== */
 .diff-removed-inline {
   background-color: rgba(220, 38, 38, 0.12);
   color: #c2410c;
-  text-decoration: line-through;
   padding: 1px 3px;
   border-radius: 4px;
   font-weight: 600;
   border: 1px dashed rgba(220, 38, 38, 0.3);
 }
-:root[data-theme="dark"] .diff-removed-inline {
+:root[data-theme="dark"] .diff-removed-inline,
+:root[data-theme="brand"] .diff-removed-inline {
   background-color: rgba(239, 68, 68, 0.18);
   color: #fca5a5;
   border-color: rgba(239, 68, 68, 0.4);
@@ -371,16 +404,24 @@ mark.hl { background: #fef08a; color: #1e293b; border-radius: 2px; padding: 0 1p
   font-weight: 700;
   border: 1px dashed rgba(21, 128, 61, 0.3);
 }
-:root[data-theme="dark"] .diff-added-inline {
+:root[data-theme="dark"] .diff-added-inline,
+:root[data-theme="brand"] .diff-added-inline {
   background-color: rgba(74, 222, 128, 0.18);
   color: #86efac;
   border-color: rgba(74, 222, 128, 0.4);
 }
 
 /* ===== SIDE-BY-SIDE TABLE ===== */
-.sbs-table { min-width: 560px; }
+.sbs-table { min-width: 720px; }
 .sbs-table th { background: var(--blue-dark); color: #f8fafc; }
 :root[data-theme="dark"] .sbs-table th { background: #1d4ed8; }
+:root[data-theme="brand"] .sbs-table th { background: #1d4ed8; }
+.sbs-table td { vertical-align: top; }
+.sbs-table tbody tr:nth-child(even) { background: rgba(120, 130, 150, 0.05); }
+.sbs-code { font-weight: 700; font-family: "Consolas", "SFMono-Regular", monospace; white-space: nowrap; }
+.sbs-edition { font-weight: 600; color: var(--navy); white-space: nowrap; }
+.sbs-col-prev { background: rgba(220, 38, 38, 0.03); border-right: 2px solid var(--line); }
+.sbs-col-curr { background: rgba(21, 128, 61, 0.03); }
 .sbs-removed { color: var(--red); }
 .sbs-added   { color: var(--green); font-weight: 700; }
 .sbs-changed { color: var(--orange); }
@@ -429,6 +470,12 @@ dialog::backdrop { background: rgba(0,0,0,0.35); backdrop-filter: blur(2px); }
 .db-del-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 13px; padding: 2px 6px; }
 .db-del-btn:hover { color: var(--red); }
 .databank-stat-line { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
+
+.result-settings-rows { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.result-settings-row { display: flex; align-items: center; gap: 8px; }
+.result-settings-row .rs-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.result-settings-row .rs-default { font-size: 11px; color: var(--muted); width: 110px; flex-shrink: 0; }
+.result-settings-row input[type="text"] { flex: 1; padding: 6px 9px; border: 1.5px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font-size: 12.5px; }
 
 /* Prefix chips list inside the modal */
 .db-prefix-chip { display: inline-flex; align-items: center; gap: 4px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 2px 4px 2px 9px; font-size: 11.5px; margin: 2px 3px 2px 0; }
@@ -681,12 +728,12 @@ body.section-maximized {
           <div class="metric"><span>Previous</span><strong id="metricPrevious">0</strong></div>
           <div class="metric"><span>Current</span><strong id="metricCurrent">0</strong></div>
           <div class="metric good"><span>Matches</span><strong id="metricMatch">0</strong></div>
-          <div class="metric added"><span>Added</span><strong id="metricAdded">0</strong></div>
-          <div class="metric removed"><span>Removed</span><strong id="metricRemoved">0</strong></div>
-          <div class="metric changed"><span>Edition Changed</span><strong id="metricChanged">0</strong></div>
-          <div class="metric desc-changed"><span>Desc Changed</span><strong id="metricDescChanged">0</strong></div>
-          <div class="metric typo"><span>Possible Typo</span><strong id="metricTypo">0</strong></div>
-          <div class="metric unknown"><span>Unknown</span><strong id="metricUnknown">0</strong></div>
+          <div class="metric added"><span id="metricLabelAdded">Added</span><strong id="metricAdded">0</strong></div>
+          <div class="metric removed"><span id="metricLabelRemoved">Removed</span><strong id="metricRemoved">0</strong></div>
+          <div class="metric changed"><span id="metricLabelChanged">Edition Changed</span><strong id="metricChanged">0</strong></div>
+          <div class="metric desc-changed"><span id="metricLabelDescChanged">Desc Changed</span><strong id="metricDescChanged">0</strong></div>
+          <div class="metric typo"><span id="metricLabelTypo">Possible Typo</span><strong id="metricTypo">0</strong></div>
+          <div class="metric unknown"><span id="metricLabelUnknown">Unknown</span><strong id="metricUnknown">0</strong></div>
           <div class="metric"><span>Completion</span><strong id="metricCompletion">0%</strong></div>
         </section>
 
@@ -804,13 +851,14 @@ body.section-maximized {
           <!-- V2.0 Filter Bar -->
           <div class="filter-bar" id="filterBar">
             <div class="filter-chips">
-              <button class="chip chip-match"   id="chipMatch"   type="button"><span class="chip-dot"></span> Match <span id="cntMatch">(0)</span></button>
-              <button class="chip chip-added"   id="chipAdded"   type="button"><span class="chip-dot"></span> Added <span id="cntAdded">(0)</span></button>
-              <button class="chip chip-removed" id="chipRemoved" type="button"><span class="chip-dot"></span> Removed <span id="cntRemoved">(0)</span></button>
-              <button class="chip chip-changed" id="chipChanged" type="button"><span class="chip-dot"></span> Changed <span id="cntChanged">(0)</span></button>
-              <button class="chip chip-desc-changed" id="chipDescChanged" type="button"><span class="chip-dot"></span> Desc Changed <span id="cntDescChanged">(0)</span></button>
-              <button class="chip chip-typo" id="chipTypo" type="button"><span class="chip-dot"></span> Possible Typo <span id="cntTypo">(0)</span></button>
-              <button class="chip chip-unknown" id="chipUnknown" type="button"><span class="chip-dot"></span> Unknown <span id="cntUnknown">(0)</span></button>
+              <button class="chip chip-match"   id="chipMatch"   type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelMatch">Match</span> <span id="cntMatch">(0)</span></button>
+              <button class="chip chip-added"   id="chipAdded"   type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelAdded">Added</span> <span id="cntAdded">(0)</span></button>
+              <button class="chip chip-removed" id="chipRemoved" type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelRemoved">Removed</span> <span id="cntRemoved">(0)</span></button>
+              <button class="chip chip-changed" id="chipChanged" type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelChanged">Changed</span> <span id="cntChanged">(0)</span></button>
+              <button class="chip chip-desc-changed" id="chipDescChanged" type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelDescChanged">Desc Changed</span> <span id="cntDescChanged">(0)</span></button>
+              <button class="chip chip-typo" id="chipTypo" type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelTypo">Possible Typo</span> <span id="cntTypo">(0)</span></button>
+              <button class="chip chip-unknown" id="chipUnknown" type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelUnknown">Unknown</span> <span id="cntUnknown">(0)</span></button>
+              <button class="chip chip-manual" id="chipManual" type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelManual">Manually Linked</span> <span id="cntManual">(0)</span></button>
             </div>
             <div class="filter-search-wrap">
               <span class="search-icon">🔍</span>
@@ -848,8 +896,10 @@ body.section-maximized {
               <thead>
                 <tr>
                   <th style="width:90px;">Status</th>
-                  <th class="copyable-header" id="hdrSbsPrev" title="Click to copy Previous Form column">Previous Form 📋</th>
-                  <th class="copyable-header" id="hdrSbsCurr" title="Click to copy Current Form column">Current Form 📋</th>
+                  <th style="width:110px;">Code</th>
+                  <th class="copyable-header sbs-col-prev" id="hdrSbsPrev" title="Click to copy Previous Form column">Previous Form 📋</th>
+                  <th class="copyable-header sbs-col-curr" id="hdrSbsCurr" title="Click to copy Current Form column">Current Form 📋</th>
+                  <th style="width:90px;">Edition</th>
                   <th style="width:70px;text-align:right;">Actions</th>
                 </tr>
               </thead>
@@ -903,6 +953,13 @@ body.section-maximized {
             <button class="btn small" id="openDataBankBtn" type="button">Open Data Bank</button>
           </div>
           <p class="databank-stat-line" id="dataBankStatLine">No data learned yet — run a comparison and it starts building automatically.</p>
+          <div class="section-head" style="margin-top:18px;">
+            <h3>Result Display</h3>
+            <button class="btn small" id="rsPresetBtn" type="button">Coworker Format</button>
+          </div>
+          <p class="databank-stat-line">Show/hide statuses and rename their labels — applies to the results table, side-by-side view, charts, and CSV/Excel/TSV exports.</p>
+          <div id="resultSettingsRows" class="result-settings-rows"></div>
+          <button class="btn small secondary" id="rsResetBtn" type="button" style="margin-top:8px;">Reset to Defaults</button>
         </section>
       </main>
     </div>
@@ -1939,7 +1996,8 @@ body.section-maximized {
     results: [], checklistRows: [],
     collapsedGroups: new Set(),
     // v2.0
-    filters: { Match: true, Added: true, Removed: true, "Edition Changed": true, "Description Changed": true, "Possible Typo": true, "Unknown Format": true },
+    filters: { Match: true, Added: true, Removed: true, "Edition Changed": true, "Description Changed": true, "Possible Typo": true, "Unknown Format": true, "Manually Linked": true },
+    statusLabels: {},         // status -> custom display label; empty = use defaults
     searchQuery: "",
     diffsOnly: false,
     sideBySide: false,
@@ -2006,6 +2064,86 @@ body.section-maximized {
     return String(v || "")
       .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
       .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+  }
+
+  /* ── RESULT DISPLAY SETTINGS (labels + visibility) ────────
+     One place to customize what each status is called and whether it's
+     shown at all — applies everywhere a status appears: results table,
+     side-by-side, filter chips, metric cards, charts, and CSV/Excel/TSV
+     exports. Some teams use different wording ("Deleted" instead of
+     "Removed", etc.) — this lets the tool's output match without touching
+     the underlying matching logic, which still uses the original names. */
+  const RESULT_SETTINGS_KEY = "formsComparatorResultSettingsV1";
+  const STATUS_META = [
+    { key: "Match",               chipId: "chipMatch",       cntId: "cntMatch",       labelId: "chipLabelMatch",       metricLabelId: null,                  dotVar: "--s-match" },
+    { key: "Added",                chipId: "chipAdded",       cntId: "cntAdded",       labelId: "chipLabelAdded",       metricLabelId: "metricLabelAdded",    dotVar: "--s-added" },
+    { key: "Removed",              chipId: "chipRemoved",     cntId: "cntRemoved",     labelId: "chipLabelRemoved",     metricLabelId: "metricLabelRemoved",  dotVar: "--s-removed" },
+    { key: "Edition Changed",      chipId: "chipChanged",     cntId: "cntChanged",     labelId: "chipLabelChanged",     metricLabelId: "metricLabelChanged",  dotVar: "--s-changed" },
+    { key: "Description Changed",  chipId: "chipDescChanged", cntId: "cntDescChanged", labelId: "chipLabelDescChanged", metricLabelId: "metricLabelDescChanged", dotVar: "--s-desc-changed" },
+    { key: "Possible Typo",        chipId: "chipTypo",        cntId: "cntTypo",        labelId: "chipLabelTypo",        metricLabelId: "metricLabelTypo",     dotVar: "--s-typo" },
+    { key: "Unknown Format",       chipId: "chipUnknown",     cntId: "cntUnknown",     labelId: "chipLabelUnknown",     metricLabelId: "metricLabelUnknown",  dotVar: "--s-unknown" },
+    { key: "Manually Linked",      chipId: "chipManual",      cntId: "cntManual",      labelId: "chipLabelManual",      metricLabelId: null,                  dotVar: "--s-manual" },
+  ];
+  // Your coworkers' terminology — Removed/Unknown Format renamed; everything
+  // else keeps its default wording. Edit the values here (or just use the
+  // text boxes in Settings) if this guess doesn't match their sheet exactly.
+  const COWORKER_PRESET = { Removed: "Deleted", "Unknown Format": "Not Present" };
+
+  function displayLabel(status) {
+    return (state.statusLabels && state.statusLabels[status]) || status;
+  }
+
+  function loadResultSettings() {
+    try {
+      const raw = localStorage.getItem(RESULT_SETTINGS_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed.labels) state.statusLabels = parsed.labels;
+      if (parsed.filters) Object.assign(state.filters, parsed.filters);
+    } catch { /* ignore corrupt/unavailable storage, defaults stand */ }
+  }
+
+  function saveResultSettings() {
+    try {
+      localStorage.setItem(RESULT_SETTINGS_KEY, JSON.stringify({ labels: state.statusLabels, filters: state.filters }));
+    } catch { /* storage full/unavailable — setting just won't persist this session */ }
+  }
+
+  // Pushes current labels/visibility into every static bit of UI (chips,
+  // metric cards, settings panel) and re-renders everything that displays
+  // a status. Call after any label or visibility change.
+  function applyResultSettings() {
+    STATUS_META.forEach(m => {
+      const label = displayLabel(m.key);
+      const labelEl = document.getElementById(m.labelId);
+      if (labelEl) labelEl.textContent = label;
+      if (m.metricLabelId) {
+        const metricEl = document.getElementById(m.metricLabelId);
+        if (metricEl) metricEl.textContent = label;
+      }
+      const chipEl = document.getElementById(m.chipId);
+      if (chipEl) chipEl.classList.toggle("off", state.filters[m.key] === false);
+    });
+    renderResultSettingsRows();
+    saveResultSettings();
+    if (state.results.length) {
+      renderResults();
+      if (!el.sbsWrap.classList.contains("hidden")) renderSBS();
+      drawCharts(summarize(state.results));
+      updateFilterCounts();
+    }
+  }
+
+  function renderResultSettingsRows() {
+    const wrap = document.getElementById("resultSettingsRows");
+    if (!wrap) return;
+    wrap.innerHTML = STATUS_META.map(m => `
+      <div class="result-settings-row">
+        <input type="checkbox" id="rsVis_${m.chipId}" ${state.filters[m.key] !== false ? "checked" : ""} data-rs-vis="${esc(m.key)}" title="Show/hide this status" />
+        <span class="rs-dot" style="background:var(${m.dotVar})"></span>
+        <span class="rs-default">${esc(m.key)}</span>
+        <input type="text" data-rs-label="${esc(m.key)}" value="${esc(displayLabel(m.key))}" placeholder="${esc(m.key)}" />
+      </div>`).join("");
   }
 
   function highlight(text, q) {
@@ -2116,7 +2254,7 @@ body.section-maximized {
 
   function updateFilterCounts() {
     const rows = baseRows();
-    const c = { Match: 0, Added: 0, Removed: 0, "Edition Changed": 0, "Description Changed": 0, "Possible Typo": 0, "Unknown Format": 0 };
+    const c = { Match: 0, Added: 0, Removed: 0, "Edition Changed": 0, "Description Changed": 0, "Possible Typo": 0, "Unknown Format": 0, "Manually Linked": 0 };
     rows.forEach(r => { if (c[r.status] !== undefined) c[r.status]++; });
     document.getElementById("cntMatch").textContent   = `(${c.Match})`;
     document.getElementById("cntAdded").textContent   = `(${c.Added})`;
@@ -2125,6 +2263,7 @@ body.section-maximized {
     document.getElementById("cntDescChanged").textContent = `(${c["Description Changed"]})`;
     document.getElementById("cntTypo").textContent   = `(${c["Possible Typo"]})`;
     document.getElementById("cntUnknown").textContent = `(${c["Unknown Format"]})`;
+    document.getElementById("cntManual").textContent = `(${c["Manually Linked"]})`;
     updateScopeNote();
   }
 
@@ -2175,6 +2314,43 @@ body.section-maximized {
     el.resultsBody.innerHTML = rows.map(resultRowHtml).join("");
   }
 
+  // Best-effort split of an unparsed raw line into a code guess + edition guess
+  // + description guess, so Quick Add starts pre-filled instead of empty. This
+  // is a guess — the fields stay editable so the user confirms/fixes it before saving.
+  function guessCodeAndDescription(rawLine) {
+    let clean = String(rawLine || "").trim().replace(/\s+/g, " ");
+
+    // Pull out something that looks like an edition date: (04/13), 04/13, or 0413
+    let edition = "";
+    const editionMatch = clean.match(/\(?(\d{2}\/\d{2}|\d{4})\)?/);
+    if (editionMatch) {
+      edition = editionMatch[1];
+      clean = (clean.slice(0, editionMatch.index) + clean.slice(editionMatch.index + editionMatch[0].length)).replace(/\s+/g, " ").trim();
+    }
+
+    // Leading run of short alphanumeric tokens (1-6 chars each, up to 4 of them)
+    // looks like a form code; everything after is treated as the description.
+    const m = clean.match(/^((?:[A-Z0-9]{1,6}\s+){0,3}[A-Z0-9]{1,6})\s*(.*)$/i);
+    if (m && m[1]) {
+      return { code: m[1].trim().toUpperCase(), edition, description: (m[2] || "").trim() };
+    }
+    return { code: "", edition, description: clean };
+  }
+
+  function openDataBankFromRow(rowId) {
+    const item = state.results.find(r => r._id === rowId);
+    if (!item) return;
+    const raw = item.originalCurrent || item.originalPrevious || item.displayCode || "";
+    const guess = guessCodeAndDescription(raw);
+    document.getElementById("dbAddCode").value = guess.code;
+    document.getElementById("dbAddDesc").value = guess.description;
+    document.getElementById("dbAddEdition").value = guess.edition;
+    renderDataBankTable();
+    document.getElementById("dataBankModal").showModal();
+    const codeInput = document.getElementById("dbAddCode");
+    codeInput.focus(); codeInput.select();
+  }
+
   // Statuses where a row might be the "other half" of a form the auto-matcher missed
   // or mismatched — these are the only ones eligible for manual re-pairing.
   const LINKABLE_STATUSES = new Set(["Added", "Removed", "Unknown Format"]);
@@ -2200,6 +2376,11 @@ body.section-maximized {
     return `<span class="conf-badge" title="Description similarity score">${pct}%</span>`;
   }
 
+  function addToDataBankButtonHtml(item) {
+    if (item.status !== "Unknown Format" || !item._id) return "";
+    return `<button class="db-add-btn" type="button" data-db-add="${esc(item._id)}" title="This is actually a real form — add it to the Data Bank">➕🗄</button>`;
+  }
+
   function resultRowHtml(item) {
     const code    = item.normalizedCode || "";
     const pinned  = state.pinnedCodes.has(code);
@@ -2211,7 +2392,7 @@ body.section-maximized {
     const diffs = diffHighlight(item.originalPrevious, item.originalCurrent, q);
     const rowClasses = [statusClass(item.status), pinned ? "row-pinned" : "", item.manual ? "row-manual" : ""].filter(Boolean).join(" ");
     return `<tr class="${rowClasses}" data-code="${esc(code)}"${item._id ? ` data-id="${esc(item._id)}"` : ""}>
-      <td>${esc(item.status)} ${duplicateBadgeHtml(item)}${confidenceBadgeHtml(item)}</td>
+      <td>${esc(displayLabel(item.status))} ${duplicateBadgeHtml(item)}${confidenceBadgeHtml(item)}</td>
       <td>${esc(item.source || "Current Policy")}</td>
       <td><span contenteditable="true" data-field="displayCode" data-code="${esc(code)}">${highlight(dispCode, q)}</span></td>
       <td>${diffs.prev}</td>
@@ -2221,6 +2402,7 @@ body.section-maximized {
       <td>${esc(item.notes)}</td>
       <td class="row-actions-td">
         ${linkButtonHtml(item)}
+        ${addToDataBankButtonHtml(item)}
         <button class="pin-btn${pinned ? " on" : ""}" type="button" data-pin="${esc(code)}" title="${pinned ? "Unpin" : "Pin to top"}">${pinned ? "⭐" : "☆"}</button>
         <button class="note-btn${hasNote ? " on" : ""}" type="button" data-note="${esc(code)}" title="${hasNote ? "Edit note" : "Add note"}">${hasNote ? "📝" : "🖊"}</button>
       </td>
@@ -2267,9 +2449,11 @@ body.section-maximized {
           curr = esc(item.originalCurrent  || item.displayCode);
       }
       return `<tr class="${statusClass(item.status)}${pinned ? " row-pinned" : ""}" data-code="${esc(code)}">
-        <td>${esc(item.status)}</td>
-        <td>${prev}</td>
-        <td>${curr}</td>
+        <td>${esc(displayLabel(item.status))}</td>
+        <td class="sbs-code">${esc(item.displayCode || item.normalizedCode || "")}</td>
+        <td class="sbs-col-prev">${prev}</td>
+        <td class="sbs-col-curr">${curr}</td>
+        <td class="sbs-edition">${esc(item.edition || "")}</td>
         <td class="row-actions-td">
           <button class="pin-btn${pinned ? " on" : ""}" type="button" data-pin="${esc(code)}">${pinned ? "⭐" : "☆"}</button>
           <button class="note-btn${hasNote ? " on" : ""}" type="button" data-note="${esc(code)}">${hasNote ? "📝" : "🖊"}</button>
@@ -2463,13 +2647,13 @@ body.section-maximized {
 
   function drawCharts(summary) {
     const data = [
-      ["Match",               summary.Match || 0,                    "#15803d"],
-      ["Added",               summary.Added || 0,                    "#ca8a04"],
-      ["Removed",             summary.Removed || 0,                  "#dc2626"],
-      ["Edition Changed",     summary["Edition Changed"] || 0,       "#ea580c"],
-      ["Desc Changed",        summary["Description Changed"] || 0,   "#8b5cf6"],
-      ["Possible Typo",       summary["Possible Typo"] || 0,         "#d946ef"],
-      ["Unknown",             summary["Unknown Format"] || 0,        "#64748b"],
+      [displayLabel("Match"),               summary.Match || 0,                    "#15803d"],
+      [displayLabel("Added"),               summary.Added || 0,                    "#ca8a04"],
+      [displayLabel("Removed"),             summary.Removed || 0,                  "#dc2626"],
+      [displayLabel("Edition Changed"),     summary["Edition Changed"] || 0,       "#ea580c"],
+      [displayLabel("Description Changed"), summary["Description Changed"] || 0,   "#8b5cf6"],
+      [displayLabel("Possible Typo"),       summary["Possible Typo"] || 0,         "#d946ef"],
+      [displayLabel("Unknown Format"),      summary["Unknown Format"] || 0,        "#64748b"],
     ];
     drawPie(el.pieChart, data);
     drawBars(el.barChart, data);
@@ -2552,7 +2736,7 @@ body.section-maximized {
   async function copyEntireTable() {
     const rows = getFiltered();
     const hdrs = ["Status","Code","Original Previous","Original Current","Description","Edition","Source"];
-    const body = rows.map(r => [r.status, r.displayCode||r.normalizedCode, r.originalPrevious, r.originalCurrent, r.description, r.edition, r.source||"Current Policy"]);
+    const body = rows.map(r => [displayLabel(r.status), r.displayCode||r.normalizedCode, r.originalPrevious, r.originalCurrent, r.description, r.edition, r.source||"Current Policy"]);
     const tsv = [hdrs,...body].map(row => row.map(c => String(c||"").replace(/\t/g," ").replace(/\n/g," ")).join("\t")).join("\n");
     await copyText(tsv);
     flashBtn("copyTableBtn", "✓ Copied!", "📋 Copy Table");
@@ -2694,7 +2878,7 @@ body.section-maximized {
     if (opts.notes) hdrs.push("User Note");
     hdrs.push("Edition","System Note");
     const body = rows.map(r => {
-      const cells = [r.status, r.displayCode||r.normalizedCode, r.originalPrevious, r.originalCurrent];
+      const cells = [displayLabel(r.status), r.displayCode||r.normalizedCode, r.originalPrevious, r.originalCurrent];
       if (opts.desc !== false) cells.push(r.description);
       if (opts.source) cells.push(r.source||"Current Policy");
       if (opts.notes) cells.push(state.rowNotes.get(r.normalizedCode)||"");
@@ -2713,7 +2897,7 @@ body.section-maximized {
     if (opts.notes) hdrs.push("User Note");
     hdrs.push("Edition");
     const body = rows.map(r => {
-      const cells = [r.status, r.displayCode||r.normalizedCode, r.originalPrevious, r.originalCurrent];
+      const cells = [displayLabel(r.status), r.displayCode||r.normalizedCode, r.originalPrevious, r.originalCurrent];
       if (opts.desc !== false) cells.push(r.description);
       if (opts.source) cells.push(r.source||"Current Policy");
       if (opts.notes) cells.push(state.rowNotes.get(r.normalizedCode)||"");
@@ -2749,7 +2933,7 @@ body.section-maximized {
     if (opts.notes) hdrs.push("User Note");
     hdrs.push("Edition");
     const body = rows.map(r => {
-      const cells = [r.status, r.displayCode||r.normalizedCode];
+      const cells = [displayLabel(r.status), r.displayCode||r.normalizedCode];
       if (opts.desc) cells.push(r.description);
       if (opts.source) cells.push(r.source||"Current Policy");
       if (opts.notes) cells.push(state.rowNotes.get(r.normalizedCode)||"");
@@ -3005,15 +3189,44 @@ body.section-maximized {
     chipChanged: "Edition Changed",
     chipDescChanged: "Description Changed",
     chipTypo: "Possible Typo",
-    chipUnknown: "Unknown Format"
+    chipUnknown: "Unknown Format",
+    chipManual: "Manually Linked",
   };
-  for (const [id, status] of Object.entries(chipMap)) {
-    document.getElementById(id).addEventListener("click", () => {
-      state.filters[status] = !state.filters[status];
-      document.getElementById(id).classList.toggle("off", !state.filters[status]);
-      renderResults();
-    });
+  function toggleStatusVisibility(status, forceValue) {
+    state.filters[status] = forceValue !== undefined ? forceValue : !(state.filters[status] !== false);
+    applyResultSettings();
   }
+  for (const [id, status] of Object.entries(chipMap)) {
+    const chipEl = document.getElementById(id);
+    if (chipEl) chipEl.addEventListener("click", () => toggleStatusVisibility(status));
+  }
+
+  /* ── RESULT DISPLAY SETTINGS UI ───────────────────────── */
+  document.getElementById("resultSettingsRows").addEventListener("change", e => {
+    const vis = e.target.closest("[data-rs-vis]");
+    if (vis) { toggleStatusVisibility(vis.getAttribute("data-rs-vis"), vis.checked); return; }
+    const lbl = e.target.closest("[data-rs-label]");
+    if (lbl) {
+      const status = lbl.getAttribute("data-rs-label");
+      const v = lbl.value.trim();
+      if (v) state.statusLabels[status] = v; else delete state.statusLabels[status];
+      applyResultSettings();
+    }
+  });
+
+  document.getElementById("rsPresetBtn").addEventListener("click", () => {
+    Object.assign(state.statusLabels, COWORKER_PRESET);
+    applyResultSettings();
+  });
+
+  document.getElementById("rsResetBtn").addEventListener("click", () => {
+    state.statusLabels = {};
+    STATUS_META.forEach(m => { state.filters[m.key] = true; });
+    applyResultSettings();
+  });
+
+  loadResultSettings();
+  applyResultSettings();
 
   /* ── THEME ────────────────────────────────────────────── */
   const THEME_ORDER = ["light", "dark", "brand"];
@@ -3082,6 +3295,10 @@ body.section-maximized {
   document.getElementById("closeDataBankBtn").addEventListener("click", () => document.getElementById("dataBankModal").close());
   document.getElementById("dbSearch").addEventListener("input", renderDataBankTable);
 
+  function recompareIfLoaded() {
+    if (el.previousInput.value.trim() || el.currentInput.value.trim()) compare();
+  }
+
   document.getElementById("dbAddCodeBtn").addEventListener("click", () => {
     const codeInput = document.getElementById("dbAddCode");
     const code = codeInput.value.trim();
@@ -3091,6 +3308,7 @@ body.section-maximized {
     window.ComparatorDataBank.quickAddCode(code, desc, edition);
     codeInput.value = ""; document.getElementById("dbAddEdition").value = ""; document.getElementById("dbAddDesc").value = "";
     renderDataBankTable(); updateDataBankStatLine();
+    recompareIfLoaded();
   });
 
   document.getElementById("dbAddPrefixBtn").addEventListener("click", () => {
@@ -3099,6 +3317,7 @@ body.section-maximized {
     window.ComparatorDataBank.quickAddPrefix(input.value.trim());
     input.value = "";
     renderPrefixChips(); updateDataBankStatLine();
+    recompareIfLoaded();
   });
 
   document.getElementById("dataBankBody").addEventListener("click", e => {
@@ -3225,6 +3444,8 @@ body.section-maximized {
     }
     const lb = e.target.closest("[data-link]");
     if (lb) { handleLinkClick(lb.getAttribute("data-link")); return; }
+    const db = e.target.closest("[data-db-add]");
+    if (db) { openDataBankFromRow(db.getAttribute("data-db-add")); return; }
     const pb = e.target.closest("[data-pin]");
     if (pb) { togglePin(pb.getAttribute("data-pin")); return; }
     const nb = e.target.closest("[data-note]");

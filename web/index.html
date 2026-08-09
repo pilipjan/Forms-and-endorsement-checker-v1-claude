@@ -108,12 +108,12 @@
           <div class="metric"><span>Previous</span><strong id="metricPrevious">0</strong></div>
           <div class="metric"><span>Current</span><strong id="metricCurrent">0</strong></div>
           <div class="metric good"><span>Matches</span><strong id="metricMatch">0</strong></div>
-          <div class="metric added"><span>Added</span><strong id="metricAdded">0</strong></div>
-          <div class="metric removed"><span>Removed</span><strong id="metricRemoved">0</strong></div>
-          <div class="metric changed"><span>Edition Changed</span><strong id="metricChanged">0</strong></div>
-          <div class="metric desc-changed"><span>Desc Changed</span><strong id="metricDescChanged">0</strong></div>
-          <div class="metric typo"><span>Possible Typo</span><strong id="metricTypo">0</strong></div>
-          <div class="metric unknown"><span>Unknown</span><strong id="metricUnknown">0</strong></div>
+          <div class="metric added"><span id="metricLabelAdded">Added</span><strong id="metricAdded">0</strong></div>
+          <div class="metric removed"><span id="metricLabelRemoved">Removed</span><strong id="metricRemoved">0</strong></div>
+          <div class="metric changed"><span id="metricLabelChanged">Edition Changed</span><strong id="metricChanged">0</strong></div>
+          <div class="metric desc-changed"><span id="metricLabelDescChanged">Desc Changed</span><strong id="metricDescChanged">0</strong></div>
+          <div class="metric typo"><span id="metricLabelTypo">Possible Typo</span><strong id="metricTypo">0</strong></div>
+          <div class="metric unknown"><span id="metricLabelUnknown">Unknown</span><strong id="metricUnknown">0</strong></div>
           <div class="metric"><span>Completion</span><strong id="metricCompletion">0%</strong></div>
         </section>
 
@@ -231,13 +231,14 @@
           <!-- V2.0 Filter Bar -->
           <div class="filter-bar" id="filterBar">
             <div class="filter-chips">
-              <button class="chip chip-match"   id="chipMatch"   type="button"><span class="chip-dot"></span> Match <span id="cntMatch">(0)</span></button>
-              <button class="chip chip-added"   id="chipAdded"   type="button"><span class="chip-dot"></span> Added <span id="cntAdded">(0)</span></button>
-              <button class="chip chip-removed" id="chipRemoved" type="button"><span class="chip-dot"></span> Removed <span id="cntRemoved">(0)</span></button>
-              <button class="chip chip-changed" id="chipChanged" type="button"><span class="chip-dot"></span> Changed <span id="cntChanged">(0)</span></button>
-              <button class="chip chip-desc-changed" id="chipDescChanged" type="button"><span class="chip-dot"></span> Desc Changed <span id="cntDescChanged">(0)</span></button>
-              <button class="chip chip-typo" id="chipTypo" type="button"><span class="chip-dot"></span> Possible Typo <span id="cntTypo">(0)</span></button>
-              <button class="chip chip-unknown" id="chipUnknown" type="button"><span class="chip-dot"></span> Unknown <span id="cntUnknown">(0)</span></button>
+              <button class="chip chip-match"   id="chipMatch"   type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelMatch">Match</span> <span id="cntMatch">(0)</span></button>
+              <button class="chip chip-added"   id="chipAdded"   type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelAdded">Added</span> <span id="cntAdded">(0)</span></button>
+              <button class="chip chip-removed" id="chipRemoved" type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelRemoved">Removed</span> <span id="cntRemoved">(0)</span></button>
+              <button class="chip chip-changed" id="chipChanged" type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelChanged">Changed</span> <span id="cntChanged">(0)</span></button>
+              <button class="chip chip-desc-changed" id="chipDescChanged" type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelDescChanged">Desc Changed</span> <span id="cntDescChanged">(0)</span></button>
+              <button class="chip chip-typo" id="chipTypo" type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelTypo">Possible Typo</span> <span id="cntTypo">(0)</span></button>
+              <button class="chip chip-unknown" id="chipUnknown" type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelUnknown">Unknown</span> <span id="cntUnknown">(0)</span></button>
+              <button class="chip chip-manual" id="chipManual" type="button"><span class="chip-dot"></span> <span class="chip-label" id="chipLabelManual">Manually Linked</span> <span id="cntManual">(0)</span></button>
             </div>
             <div class="filter-search-wrap">
               <span class="search-icon">🔍</span>
@@ -275,8 +276,10 @@
               <thead>
                 <tr>
                   <th style="width:90px;">Status</th>
-                  <th class="copyable-header" id="hdrSbsPrev" title="Click to copy Previous Form column">Previous Form 📋</th>
-                  <th class="copyable-header" id="hdrSbsCurr" title="Click to copy Current Form column">Current Form 📋</th>
+                  <th style="width:110px;">Code</th>
+                  <th class="copyable-header sbs-col-prev" id="hdrSbsPrev" title="Click to copy Previous Form column">Previous Form 📋</th>
+                  <th class="copyable-header sbs-col-curr" id="hdrSbsCurr" title="Click to copy Current Form column">Current Form 📋</th>
+                  <th style="width:90px;">Edition</th>
                   <th style="width:70px;text-align:right;">Actions</th>
                 </tr>
               </thead>
@@ -330,6 +333,13 @@
             <button class="btn small" id="openDataBankBtn" type="button">Open Data Bank</button>
           </div>
           <p class="databank-stat-line" id="dataBankStatLine">No data learned yet — run a comparison and it starts building automatically.</p>
+          <div class="section-head" style="margin-top:18px;">
+            <h3>Result Display</h3>
+            <button class="btn small" id="rsPresetBtn" type="button">Coworker Format</button>
+          </div>
+          <p class="databank-stat-line">Show/hide statuses and rename their labels — applies to the results table, side-by-side view, charts, and CSV/Excel/TSV exports.</p>
+          <div id="resultSettingsRows" class="result-settings-rows"></div>
+          <button class="btn small secondary" id="rsResetBtn" type="button" style="margin-top:8px;">Reset to Defaults</button>
         </section>
       </main>
     </div>

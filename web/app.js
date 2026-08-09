@@ -31,7 +31,8 @@
     results: [], checklistRows: [],
     collapsedGroups: new Set(),
     // v2.0
-    filters: { Match: true, Added: true, Removed: true, "Edition Changed": true, "Description Changed": true, "Possible Typo": true, "Unknown Format": true },
+    filters: { Match: true, Added: true, Removed: true, "Edition Changed": true, "Description Changed": true, "Possible Typo": true, "Unknown Format": true, "Manually Linked": true },
+    statusLabels: {},         // status -> custom display label; empty = use defaults
     searchQuery: "",
     diffsOnly: false,
     sideBySide: false,
@@ -98,6 +99,86 @@
     return String(v || "")
       .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
       .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+  }
+
+  /* ── RESULT DISPLAY SETTINGS (labels + visibility) ────────
+     One place to customize what each status is called and whether it's
+     shown at all — applies everywhere a status appears: results table,
+     side-by-side, filter chips, metric cards, charts, and CSV/Excel/TSV
+     exports. Some teams use different wording ("Deleted" instead of
+     "Removed", etc.) — this lets the tool's output match without touching
+     the underlying matching logic, which still uses the original names. */
+  const RESULT_SETTINGS_KEY = "formsComparatorResultSettingsV1";
+  const STATUS_META = [
+    { key: "Match",               chipId: "chipMatch",       cntId: "cntMatch",       labelId: "chipLabelMatch",       metricLabelId: null,                  dotVar: "--s-match" },
+    { key: "Added",                chipId: "chipAdded",       cntId: "cntAdded",       labelId: "chipLabelAdded",       metricLabelId: "metricLabelAdded",    dotVar: "--s-added" },
+    { key: "Removed",              chipId: "chipRemoved",     cntId: "cntRemoved",     labelId: "chipLabelRemoved",     metricLabelId: "metricLabelRemoved",  dotVar: "--s-removed" },
+    { key: "Edition Changed",      chipId: "chipChanged",     cntId: "cntChanged",     labelId: "chipLabelChanged",     metricLabelId: "metricLabelChanged",  dotVar: "--s-changed" },
+    { key: "Description Changed",  chipId: "chipDescChanged", cntId: "cntDescChanged", labelId: "chipLabelDescChanged", metricLabelId: "metricLabelDescChanged", dotVar: "--s-desc-changed" },
+    { key: "Possible Typo",        chipId: "chipTypo",        cntId: "cntTypo",        labelId: "chipLabelTypo",        metricLabelId: "metricLabelTypo",     dotVar: "--s-typo" },
+    { key: "Unknown Format",       chipId: "chipUnknown",     cntId: "cntUnknown",     labelId: "chipLabelUnknown",     metricLabelId: "metricLabelUnknown",  dotVar: "--s-unknown" },
+    { key: "Manually Linked",      chipId: "chipManual",      cntId: "cntManual",      labelId: "chipLabelManual",      metricLabelId: null,                  dotVar: "--s-manual" },
+  ];
+  // Your coworkers' terminology — Removed/Unknown Format renamed; everything
+  // else keeps its default wording. Edit the values here (or just use the
+  // text boxes in Settings) if this guess doesn't match their sheet exactly.
+  const COWORKER_PRESET = { Removed: "Deleted", "Unknown Format": "Not Present" };
+
+  function displayLabel(status) {
+    return (state.statusLabels && state.statusLabels[status]) || status;
+  }
+
+  function loadResultSettings() {
+    try {
+      const raw = localStorage.getItem(RESULT_SETTINGS_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed.labels) state.statusLabels = parsed.labels;
+      if (parsed.filters) Object.assign(state.filters, parsed.filters);
+    } catch { /* ignore corrupt/unavailable storage, defaults stand */ }
+  }
+
+  function saveResultSettings() {
+    try {
+      localStorage.setItem(RESULT_SETTINGS_KEY, JSON.stringify({ labels: state.statusLabels, filters: state.filters }));
+    } catch { /* storage full/unavailable — setting just won't persist this session */ }
+  }
+
+  // Pushes current labels/visibility into every static bit of UI (chips,
+  // metric cards, settings panel) and re-renders everything that displays
+  // a status. Call after any label or visibility change.
+  function applyResultSettings() {
+    STATUS_META.forEach(m => {
+      const label = displayLabel(m.key);
+      const labelEl = document.getElementById(m.labelId);
+      if (labelEl) labelEl.textContent = label;
+      if (m.metricLabelId) {
+        const metricEl = document.getElementById(m.metricLabelId);
+        if (metricEl) metricEl.textContent = label;
+      }
+      const chipEl = document.getElementById(m.chipId);
+      if (chipEl) chipEl.classList.toggle("off", state.filters[m.key] === false);
+    });
+    renderResultSettingsRows();
+    saveResultSettings();
+    if (state.results.length) {
+      renderResults();
+      if (!el.sbsWrap.classList.contains("hidden")) renderSBS();
+      drawCharts(summarize(state.results));
+      updateFilterCounts();
+    }
+  }
+
+  function renderResultSettingsRows() {
+    const wrap = document.getElementById("resultSettingsRows");
+    if (!wrap) return;
+    wrap.innerHTML = STATUS_META.map(m => `
+      <div class="result-settings-row">
+        <input type="checkbox" id="rsVis_${m.chipId}" ${state.filters[m.key] !== false ? "checked" : ""} data-rs-vis="${esc(m.key)}" title="Show/hide this status" />
+        <span class="rs-dot" style="background:var(${m.dotVar})"></span>
+        <span class="rs-default">${esc(m.key)}</span>
+        <input type="text" data-rs-label="${esc(m.key)}" value="${esc(displayLabel(m.key))}" placeholder="${esc(m.key)}" />
+      </div>`).join("");
   }
 
   function highlight(text, q) {
@@ -208,7 +289,7 @@
 
   function updateFilterCounts() {
     const rows = baseRows();
-    const c = { Match: 0, Added: 0, Removed: 0, "Edition Changed": 0, "Description Changed": 0, "Possible Typo": 0, "Unknown Format": 0 };
+    const c = { Match: 0, Added: 0, Removed: 0, "Edition Changed": 0, "Description Changed": 0, "Possible Typo": 0, "Unknown Format": 0, "Manually Linked": 0 };
     rows.forEach(r => { if (c[r.status] !== undefined) c[r.status]++; });
     document.getElementById("cntMatch").textContent   = `(${c.Match})`;
     document.getElementById("cntAdded").textContent   = `(${c.Added})`;
@@ -217,6 +298,7 @@
     document.getElementById("cntDescChanged").textContent = `(${c["Description Changed"]})`;
     document.getElementById("cntTypo").textContent   = `(${c["Possible Typo"]})`;
     document.getElementById("cntUnknown").textContent = `(${c["Unknown Format"]})`;
+    document.getElementById("cntManual").textContent = `(${c["Manually Linked"]})`;
     updateScopeNote();
   }
 
@@ -345,7 +427,7 @@
     const diffs = diffHighlight(item.originalPrevious, item.originalCurrent, q);
     const rowClasses = [statusClass(item.status), pinned ? "row-pinned" : "", item.manual ? "row-manual" : ""].filter(Boolean).join(" ");
     return `<tr class="${rowClasses}" data-code="${esc(code)}"${item._id ? ` data-id="${esc(item._id)}"` : ""}>
-      <td>${esc(item.status)} ${duplicateBadgeHtml(item)}${confidenceBadgeHtml(item)}</td>
+      <td>${esc(displayLabel(item.status))} ${duplicateBadgeHtml(item)}${confidenceBadgeHtml(item)}</td>
       <td>${esc(item.source || "Current Policy")}</td>
       <td><span contenteditable="true" data-field="displayCode" data-code="${esc(code)}">${highlight(dispCode, q)}</span></td>
       <td>${diffs.prev}</td>
@@ -402,9 +484,11 @@
           curr = esc(item.originalCurrent  || item.displayCode);
       }
       return `<tr class="${statusClass(item.status)}${pinned ? " row-pinned" : ""}" data-code="${esc(code)}">
-        <td>${esc(item.status)}</td>
-        <td>${prev}</td>
-        <td>${curr}</td>
+        <td>${esc(displayLabel(item.status))}</td>
+        <td class="sbs-code">${esc(item.displayCode || item.normalizedCode || "")}</td>
+        <td class="sbs-col-prev">${prev}</td>
+        <td class="sbs-col-curr">${curr}</td>
+        <td class="sbs-edition">${esc(item.edition || "")}</td>
         <td class="row-actions-td">
           <button class="pin-btn${pinned ? " on" : ""}" type="button" data-pin="${esc(code)}">${pinned ? "⭐" : "☆"}</button>
           <button class="note-btn${hasNote ? " on" : ""}" type="button" data-note="${esc(code)}">${hasNote ? "📝" : "🖊"}</button>
@@ -598,13 +682,13 @@
 
   function drawCharts(summary) {
     const data = [
-      ["Match",               summary.Match || 0,                    "#15803d"],
-      ["Added",               summary.Added || 0,                    "#ca8a04"],
-      ["Removed",             summary.Removed || 0,                  "#dc2626"],
-      ["Edition Changed",     summary["Edition Changed"] || 0,       "#ea580c"],
-      ["Desc Changed",        summary["Description Changed"] || 0,   "#8b5cf6"],
-      ["Possible Typo",       summary["Possible Typo"] || 0,         "#d946ef"],
-      ["Unknown",             summary["Unknown Format"] || 0,        "#64748b"],
+      [displayLabel("Match"),               summary.Match || 0,                    "#15803d"],
+      [displayLabel("Added"),               summary.Added || 0,                    "#ca8a04"],
+      [displayLabel("Removed"),             summary.Removed || 0,                  "#dc2626"],
+      [displayLabel("Edition Changed"),     summary["Edition Changed"] || 0,       "#ea580c"],
+      [displayLabel("Description Changed"), summary["Description Changed"] || 0,   "#8b5cf6"],
+      [displayLabel("Possible Typo"),       summary["Possible Typo"] || 0,         "#d946ef"],
+      [displayLabel("Unknown Format"),      summary["Unknown Format"] || 0,        "#64748b"],
     ];
     drawPie(el.pieChart, data);
     drawBars(el.barChart, data);
@@ -687,7 +771,7 @@
   async function copyEntireTable() {
     const rows = getFiltered();
     const hdrs = ["Status","Code","Original Previous","Original Current","Description","Edition","Source"];
-    const body = rows.map(r => [r.status, r.displayCode||r.normalizedCode, r.originalPrevious, r.originalCurrent, r.description, r.edition, r.source||"Current Policy"]);
+    const body = rows.map(r => [displayLabel(r.status), r.displayCode||r.normalizedCode, r.originalPrevious, r.originalCurrent, r.description, r.edition, r.source||"Current Policy"]);
     const tsv = [hdrs,...body].map(row => row.map(c => String(c||"").replace(/\t/g," ").replace(/\n/g," ")).join("\t")).join("\n");
     await copyText(tsv);
     flashBtn("copyTableBtn", "✓ Copied!", "📋 Copy Table");
@@ -829,7 +913,7 @@
     if (opts.notes) hdrs.push("User Note");
     hdrs.push("Edition","System Note");
     const body = rows.map(r => {
-      const cells = [r.status, r.displayCode||r.normalizedCode, r.originalPrevious, r.originalCurrent];
+      const cells = [displayLabel(r.status), r.displayCode||r.normalizedCode, r.originalPrevious, r.originalCurrent];
       if (opts.desc !== false) cells.push(r.description);
       if (opts.source) cells.push(r.source||"Current Policy");
       if (opts.notes) cells.push(state.rowNotes.get(r.normalizedCode)||"");
@@ -848,7 +932,7 @@
     if (opts.notes) hdrs.push("User Note");
     hdrs.push("Edition");
     const body = rows.map(r => {
-      const cells = [r.status, r.displayCode||r.normalizedCode, r.originalPrevious, r.originalCurrent];
+      const cells = [displayLabel(r.status), r.displayCode||r.normalizedCode, r.originalPrevious, r.originalCurrent];
       if (opts.desc !== false) cells.push(r.description);
       if (opts.source) cells.push(r.source||"Current Policy");
       if (opts.notes) cells.push(state.rowNotes.get(r.normalizedCode)||"");
@@ -884,7 +968,7 @@
     if (opts.notes) hdrs.push("User Note");
     hdrs.push("Edition");
     const body = rows.map(r => {
-      const cells = [r.status, r.displayCode||r.normalizedCode];
+      const cells = [displayLabel(r.status), r.displayCode||r.normalizedCode];
       if (opts.desc) cells.push(r.description);
       if (opts.source) cells.push(r.source||"Current Policy");
       if (opts.notes) cells.push(state.rowNotes.get(r.normalizedCode)||"");
@@ -1140,15 +1224,44 @@
     chipChanged: "Edition Changed",
     chipDescChanged: "Description Changed",
     chipTypo: "Possible Typo",
-    chipUnknown: "Unknown Format"
+    chipUnknown: "Unknown Format",
+    chipManual: "Manually Linked",
   };
-  for (const [id, status] of Object.entries(chipMap)) {
-    document.getElementById(id).addEventListener("click", () => {
-      state.filters[status] = !state.filters[status];
-      document.getElementById(id).classList.toggle("off", !state.filters[status]);
-      renderResults();
-    });
+  function toggleStatusVisibility(status, forceValue) {
+    state.filters[status] = forceValue !== undefined ? forceValue : !(state.filters[status] !== false);
+    applyResultSettings();
   }
+  for (const [id, status] of Object.entries(chipMap)) {
+    const chipEl = document.getElementById(id);
+    if (chipEl) chipEl.addEventListener("click", () => toggleStatusVisibility(status));
+  }
+
+  /* ── RESULT DISPLAY SETTINGS UI ───────────────────────── */
+  document.getElementById("resultSettingsRows").addEventListener("change", e => {
+    const vis = e.target.closest("[data-rs-vis]");
+    if (vis) { toggleStatusVisibility(vis.getAttribute("data-rs-vis"), vis.checked); return; }
+    const lbl = e.target.closest("[data-rs-label]");
+    if (lbl) {
+      const status = lbl.getAttribute("data-rs-label");
+      const v = lbl.value.trim();
+      if (v) state.statusLabels[status] = v; else delete state.statusLabels[status];
+      applyResultSettings();
+    }
+  });
+
+  document.getElementById("rsPresetBtn").addEventListener("click", () => {
+    Object.assign(state.statusLabels, COWORKER_PRESET);
+    applyResultSettings();
+  });
+
+  document.getElementById("rsResetBtn").addEventListener("click", () => {
+    state.statusLabels = {};
+    STATUS_META.forEach(m => { state.filters[m.key] = true; });
+    applyResultSettings();
+  });
+
+  loadResultSettings();
+  applyResultSettings();
 
   /* ── THEME ────────────────────────────────────────────── */
   const THEME_ORDER = ["light", "dark", "brand"];
