@@ -88,7 +88,12 @@ button, input, textarea { font: inherit; }
 
 /* ===== DARK MODE SIDEBAR ===== */
 :root[data-theme="dark"] .sidebar { background: linear-gradient(180deg, #123b74 0%, #0b2c59 55%, #081f3d 100%); }
-:root[data-theme="brand"] .sidebar { background: linear-gradient(180deg, #123b74 0%, #0b2c59 55%, #081f3d 100%); }
+:root[data-theme="brand"] .sidebar { background: linear-gradient(180deg, #2a1608 0%, #1a0f06 55%, #0d0805 100%); }
+:root[data-theme="brand"] .brand-mark { color: #ff7a1a; }
+:root[data-theme="brand"] .eyebrow { color: #ff7a1a; }
+:root[data-theme="brand"] .topbar { border-bottom-color: #ff7a1a; }
+:root[data-theme="brand"] .nav-list a { background: rgba(255,122,26,0.16); }
+:root[data-theme="brand"] .side-panel { border-top-color: rgba(255,122,26,0.25); }
 :root[data-theme="dark"] .brand-mark { background: #eaf4ff; color: #0f5fb9; }
 :root[data-theme="brand"] .brand-mark { background: #eaf4ff; color: #0f5fb9; }
 :root[data-theme="dark"] .nav-list a { background: rgba(255,255,255,0.1); }
@@ -227,6 +232,13 @@ textarea { width: 100%; height: 210px; margin: 12px 0; padding: 12px; border: 1p
 table { width: 100%; border-collapse: collapse; min-width: 680px; }
 th, td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
 th { background: #f1f5f9; color: #334155; font-weight: 800; position: sticky; top: 0; z-index: 1; }
+
+/* Compact density mode — for people scanning hundreds of rows a day */
+html.compact-mode th, html.compact-mode td { padding: 3px 8px; font-size: 12px; }
+html.compact-mode .results-table-wrap, html.compact-mode .preview-table-wrap { max-height: 620px; }
+html.compact-mode .chip { padding: 2px 8px; font-size: 11px; }
+html.compact-mode .metric { padding: 8px 10px !important; }
+html.compact-mode .metric strong { font-size: 18px; }
 .result-table th:nth-child(-n+3) { background: var(--blue-dark); color: #f8fafc; }
 .copyable-header {
   cursor: pointer;
@@ -407,6 +419,10 @@ mark.hl { background: #fef08a; color: #1e293b; border-radius: 2px; padding: 0 1p
 .sbs-table td { vertical-align: top; }
 .sbs-table tbody tr:nth-child(even) { background: rgba(120, 130, 150, 0.05); }
 .sbs-code { font-weight: 700; font-family: "Consolas", "SFMono-Regular", monospace; white-space: nowrap; }
+#previousPreview td:nth-child(2), #currentPreview td:nth-child(2),
+#quotePreview td:nth-child(2), #fourthPreview td:nth-child(2) {
+  font-family: "Consolas", "SFMono-Regular", monospace; font-weight: 700;
+}
 .sbs-edition { font-weight: 600; color: var(--navy); white-space: nowrap; }
 .sbs-col-prev { background: rgba(220, 38, 38, 0.03); border-right: 2px solid var(--line); }
 .sbs-col-curr { background: rgba(21, 128, 61, 0.03); }
@@ -533,7 +549,43 @@ dialog::backdrop { background: rgba(0,0,0,0.35); backdrop-filter: blur(2px); }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1500px) { .workspace { grid-template-columns: 1fr; } }
-@media (max-width: 1180px) { .app-shell { grid-template-columns: 1fr; } .sidebar { position: static; } .dashboard-grid { grid-template-columns: 1fr; } }
+
+.sidebar-backdrop { display: none; }
+
+@media (max-width: 1180px) {
+  .app-shell { grid-template-columns: 1fr; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+
+  /* Sidebar becomes an off-canvas drawer instead of stacking above the
+     content — the content is what people came here to use, so it should
+     be visible immediately, not buried below nav/instructions. */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    width: 280px;
+    z-index: 210;
+    transform: translateX(-100%);
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+  }
+  .app-shell.sidebar-mobile-open .sidebar {
+    transform: translateX(0);
+    box-shadow: 24px 0 60px rgba(0,0,0,0.35);
+  }
+  .app-shell.sidebar-mobile-open .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 200;
+  }
+  /* On mobile the desktop collapse mechanism is irrelevant — the drawer
+     controls visibility instead */
+  .app-shell.sidebar-collapsed .sidebar { transform: translateX(-100%); }
+}
+
 @media (max-width: 700px) {
   .main, .sidebar { padding: 16px; }
   .topbar, .section-head, .memory-banner { align-items: flex-start; flex-direction: column; }
@@ -542,6 +594,23 @@ dialog::backdrop { background: rgba(0,0,0,0.35); backdrop-filter: blur(2px); }
   .results-copy-group { justify-content: flex-start; }
   .filter-bar { flex-direction: column; align-items: flex-start; }
 }
+
+/* Sidebar Actions list (secondary buttons moved out of the top toolbar) */
+.sidebar-actions { display: flex; flex-direction: column; gap: 8px; }
+.sidebar-actions .btn.full { width: 100%; justify-content: flex-start; }
+.nav-icon { display: inline-block; width: 18px; text-align: center; }
+.btn.danger-text { color: #fecaca; }
+:root[data-theme="dark"] .sidebar-actions .btn,
+:root[data-theme="brand"] .sidebar-actions .btn { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.18); color: #fff; }
+
+/* ===== DATA BANK DASHBOARD WIDGET ===== */
+.databank-widget { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); padding: 16px 18px; margin: 18px 0; }
+.databank-widget-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.databank-widget-head h3 { margin: 0 0 4px; font-size: 15px; }
+.databank-widget-head p { margin: 0; font-size: 12.5px; color: var(--muted); }
+.databank-widget-prefixes { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px; }
+.databank-widget-prefixes .db-prefix-chip { font-size: 11px; }
+.databank-widget-empty { font-size: 12px; color: var(--muted); font-style: italic; }
 
 /* ===== TOGGLE GROUP (checklist current/previous) ===== */
 .toggle-group {

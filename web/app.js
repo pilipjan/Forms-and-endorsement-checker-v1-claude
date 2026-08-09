@@ -1282,11 +1282,23 @@
   /* ── DATA BANK UI ─────────────────────────────────────── */
   function updateDataBankStatLine() {
     const line = document.getElementById("dataBankStatLine");
-    if (!line || !window.ComparatorDataBank) return;
+    if (!window.ComparatorDataBank) return;
     const s = window.ComparatorDataBank.stats();
-    line.textContent = s.totalCodes
+    const text = s.totalCodes
       ? `${s.totalCodes} codes learned (${s.manualCodes} manual, ${s.autoCodes} auto) · ${s.totalPrefixes} prefixes`
       : "No data learned yet — run a comparison and it starts building automatically.";
+    if (line) line.textContent = text;
+
+    // Main-page dashboard widget (visible without opening Settings)
+    const widgetStat = document.getElementById("dbWidgetStat");
+    if (widgetStat) widgetStat.textContent = text;
+    const widgetPrefixes = document.getElementById("dbWidgetPrefixes");
+    if (widgetPrefixes) {
+      const prefixes = window.ComparatorDataBank.getPrefixes().sort();
+      widgetPrefixes.innerHTML = prefixes.length
+        ? prefixes.slice(0, 24).map(p => `<span class="db-prefix-chip">${esc(p)}</span>`).join("") + (prefixes.length > 24 ? `<span class="databank-widget-empty">+${prefixes.length - 24} more</span>` : "")
+        : '<span class="databank-widget-empty">No prefixes learned yet — recognized form prefixes will show up here as you compare.</span>';
+    }
   }
 
   function renderPrefixChips() {
@@ -1327,6 +1339,7 @@
   }
 
   document.getElementById("openDataBankBtn").addEventListener("click", openDataBank);
+  document.getElementById("openDataBankBtnWidget").addEventListener("click", openDataBank);
   document.getElementById("closeDataBankBtn").addEventListener("click", () => document.getElementById("dataBankModal").close());
   document.getElementById("dbSearch").addEventListener("input", renderDataBankTable);
 
@@ -1409,9 +1422,23 @@
   document.getElementById("cleanFourthBtn").addEventListener("click", cleanFourth);
   document.getElementById("compareBtn").addEventListener("click", compare);
   document.getElementById("compareBtnWorkspace").addEventListener("click", compare);
-  document.getElementById("toggleSidebarBtn").addEventListener("click", () => {
-    document.querySelector(".app-shell").classList.toggle("sidebar-collapsed");
-  });
+  const MOBILE_DRAWER_QUERY = "(max-width: 1180px)";
+  function toggleSidebar() {
+    const shell = document.querySelector(".app-shell");
+    if (window.matchMedia(MOBILE_DRAWER_QUERY).matches) {
+      shell.classList.toggle("sidebar-mobile-open");
+    } else {
+      shell.classList.toggle("sidebar-collapsed");
+    }
+  }
+  function closeMobileDrawer() {
+    document.querySelector(".app-shell").classList.remove("sidebar-mobile-open");
+  }
+  document.getElementById("toggleSidebarBtn").addEventListener("click", toggleSidebar);
+  document.getElementById("sidebarBackdrop").addEventListener("click", closeMobileDrawer);
+  document.querySelectorAll(".nav-list a").forEach(a => a.addEventListener("click", () => {
+    if (window.matchMedia(MOBILE_DRAWER_QUERY).matches) closeMobileDrawer();
+  }));
   document.getElementById("hdrCopyCode").addEventListener("click", copyColumnCode);
   document.getElementById("hdrCopyDesc").addEventListener("click", copyColumnDesc);
   document.getElementById("hdrCopyEdit").addEventListener("click", copyColumnEdit);
@@ -1656,6 +1683,18 @@
   /* ── INIT ─────────────────────────────────────────────── */
   try { applyTheme(localStorage.getItem("formsComparatorTheme") || "light"); }
   catch (e) { applyTheme("light"); }
+
+  function applyCompactMode(on) {
+    document.documentElement.classList.toggle("compact-mode", on);
+    document.getElementById("compactModeBtn").textContent = on ? "📏 Comfortable Mode" : "📏 Compact Mode";
+  }
+  document.getElementById("compactModeBtn").addEventListener("click", () => {
+    const on = !document.documentElement.classList.contains("compact-mode");
+    applyCompactMode(on);
+    try { localStorage.setItem("formsComparatorCompactMode", on ? "1" : "0"); } catch (e) { }
+  });
+  try { applyCompactMode(localStorage.getItem("formsComparatorCompactMode") === "1"); }
+  catch (e) { applyCompactMode(false); }
 
   const hadDraft = loadDraft();
 

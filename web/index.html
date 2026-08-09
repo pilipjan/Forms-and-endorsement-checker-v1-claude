@@ -14,6 +14,7 @@
   </head>
   <body>
     <div class="app-shell">
+      <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
       <!-- ===== SIDEBAR ===== -->
       <aside class="sidebar">
         <div class="brand">
@@ -25,10 +26,24 @@
         </div>
 
         <nav class="nav-list" aria-label="Workspace sections">
-          <a href="#workspace">Workspace</a>
-          <a href="#results">Results</a>
-          <a href="#settings">Settings</a>
+          <a href="#workspace"><span class="nav-icon">🗂</span> Workspace</a>
+          <a href="#results"><span class="nav-icon">📊</span> Results</a>
+          <a href="#databank-widget"><span class="nav-icon">🗄</span> Data Bank</a>
+          <a href="#settings"><span class="nav-icon">⚙️</span> Settings</a>
         </nav>
+
+        <section class="side-panel">
+          <h2>Actions</h2>
+          <div class="sidebar-actions">
+            <button class="btn secondary full" id="loadSamplesBtn" type="button">📄 Load Sample</button>
+            <button class="btn secondary full" id="showQuoteBtn" type="button">➕ Add 3rd Document</button>
+            <button class="btn secondary full" id="showFourthBtn" type="button">➕ Add 4th Document</button>
+            <button class="btn secondary full" id="themeToggleBtn" type="button">🌓 Dark Mode</button>
+            <button class="btn secondary full" id="compactModeBtn" type="button">📏 Compact Mode</button>
+            <a class="btn secondary full" id="downloadOfflineLink" href="./insurance-forms-comparator-offline.html" download>⬇ Download Offline Copy</a>
+            <button class="btn secondary full danger-text" id="clearBtn" type="button">🗑 Clear All</button>
+          </div>
+        </section>
 
         <section class="side-panel">
           <h2>Workflow</h2>
@@ -65,21 +80,13 @@
       <main class="main">
         <header class="topbar">
           <div style="display: flex; align-items: center; gap: 12px;">
-            <button class="btn secondary" id="toggleSidebarBtn" type="button" title="Toggle Sidebar" style="padding: 10px 12px; min-width: 42px;">☰</button>
+            <button class="btn secondary" id="toggleSidebarBtn" type="button" title="Menu" style="padding: 10px 12px; min-width: 42px;">☰</button>
             <div>
               <p class="eyebrow">Commercial policy processing</p>
               <h2>Compare Previous vs Current policy forms</h2>
             </div>
           </div>
           <div class="toolbar">
-            <button class="btn secondary" id="loadSamplesBtn" type="button">Load Sample</button>
-            <button class="btn secondary" id="showQuoteBtn" type="button">Add 3rd Document</button>
-            <button class="btn secondary" id="showFourthBtn" type="button">Add 4th Document</button>
-            <button class="btn secondary" id="themeToggleBtn" type="button">Dark Mode</button>
-            <button class="btn secondary" id="clearBtn" type="button">Clear</button>
-            <a class="btn secondary" id="downloadOfflineLink" href="./insurance-forms-comparator-offline.html" download>
-              Download Offline Copy
-            </a>
             <button class="btn primary" id="compareBtn" type="button">⚡ Compare Policies</button>
           </div>
         </header>
@@ -101,6 +108,18 @@
             <button class="btn primary small" id="saveDraftBtn" type="button">Save Draft</button>
             <button class="btn small danger" id="undoBtn" type="button" title="Recover cleared tables (Ctrl+Z)" style="display:none;">Undo Clear</button>
           </div>
+        </section>
+
+        <!-- ===== DATA BANK DASHBOARD WIDGET ===== -->
+        <section class="databank-widget" id="databank-widget" aria-label="Data bank summary">
+          <div class="databank-widget-head">
+            <div>
+              <h3>🗄 Data Bank</h3>
+              <p id="dbWidgetStat">No codes learned yet — run a comparison and it starts building automatically.</p>
+            </div>
+            <button class="btn secondary small" id="openDataBankBtnWidget" type="button">Manage</button>
+          </div>
+          <div class="databank-widget-prefixes" id="dbWidgetPrefixes"></div>
         </section>
 
         <!-- ===== METRICS ===== -->
